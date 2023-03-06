@@ -1,0 +1,7 @@
+ROUTINE %ZSTART 
+%ZSTART ; 2023-03-06: mlb: Startup Routine for Docker
+    quit
+SYSTEM  ;
+    set tSystem=$PIECE($SYSTEM,":",1)
+    do $SYSTEM.CSP.SetConfig("CSPConfigName",tSystem)
+    quit

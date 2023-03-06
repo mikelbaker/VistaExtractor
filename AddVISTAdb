@@ -1,0 +1,7 @@
+#!/bin/bash
+docker cp IRIS.DAT bay:/irisdb/rou/
+docker exec -it --user root bay chown 51773:51773 /irisdb/rou/IRIS.DAT
+docker cp IRIS.DAT tam:/irisdb/rou/
+docker exec -it --user root tam chown 51773:51773 /irisdb/rou/IRIS.DAT
+docker cp IRIS.DAT wpb:/irisdb/rou/
+docker exec -it --user root wpb chown 51773:51773 /irisdb/rou/IRIS.DAT
