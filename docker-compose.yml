@@ -13,42 +13,46 @@ services:
   bay:
     build: .
     volumes:
-      - baysys:/irissys
-      - baydb:/irisdb
-      - bayjrn:/irisjrn
+      - ./bay/sys:/irissys
+      - ./bay/db:/irisdb
+      - ./bay/jrn:/irisjrn
+      - ./bay/code:/code
     environment:
       - ISC_DATA_DIRECTORY=/irissys
-      - VX130_STA3N=516
+      - VISTA_SITE=516
     container_name: bay
     hostname: bay
   tam:
     build: .
     volumes:
-      - tamsys:/irissys
-      - tamdb:/irisdb
-      - tamjrn:/irisjrn
+      - ./tam/sys:/irissys
+      - ./tam/db:/irisdb
+      - ./tam/jrn:/irisjrn
+      - ./tam/code:/code
     environment:
       - ISC_DATA_DIRECTORY=/irissys
-      - VX130_STA3N=673
+      - VISTA_SITE=673
     container_name: tam
     hostname: tam
   wpb:
     build: .
     volumes:
-      - wpbsys:/irissys
-      - wpbdb:/irisdb
-      - wpbjrn:/irisjrn
+      - ./wpb/sys:/irissys
+      - ./wpb/db:/irisdb
+      - ./wpb/jrn:/irisjrn
+      - ./wpb/code:/code
     environment:
       - ISC_DATA_DIRECTORY=/irissys
-      - VX130_STA3N=548
+      - VISTA_SITE=548
     container_name: wpb
     hostname: wpb
   v08:
     build: .
     volumes:
-      - v08sys:/irissys
-      - v08db:/irisdb
-      - v08jrn:/irisjrn
+      - ./v08/sys:/irissys
+      - ./v08/db:/irisdb
+      - ./v08/jrn:/irisjrn
+      - ./v08/code:/code
     environment:
       - ISC_DATA_DIRECTORY=/irissys
       - IRIS_INSTANCE=V08
@@ -57,27 +61,11 @@ services:
   vx130:
     build: .
     volumes:
-      - vx130sys:/irissys
-      - vx130db:/irisdb
-      - vx130jrn:/irisjrn
+      - ./vx130/sys:/irissys
+      - ./vx130/db:/irisdb
+      - ./vx130/jrn:/irisjrn
     environment:
       - ISC_DATA_DIRECTORY=/irissys
       - IRIS_INSTANCE=VX130
     container_name: vx130
     hostname: vx130
-volumes:
-  baysys:
-  baydb:
-  bayjrn:
-  tamsys:
-  tamdb:
-  tamjrn:
-  wpbsys:
-  wpbdb:
-  wpbjrn:
-  v08sys:
-  v08db:
-  v08jrn:
-  vx130sys:
-  vx130db:
-  vx130jrn:
