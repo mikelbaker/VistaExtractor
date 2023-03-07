@@ -8,24 +8,6 @@ Class VX130.Installer
    <SystemSetting Name="Config.config.MaxServers" Value="30" />
    <SystemSetting Name="Config.config.MaxServerConn" Value="30" />
    <SystemSetting Name="Config.Journal.CurrentDirectory" Value="/irisjrn/" />
-   <Namespace Name="VAH" Create="yes" Code="ROU" Data="ROU" Ensemble="0">
-      <Configuration>
-        <Database Name="ROU" Create="yes" Dir="/irisdb/rou"/>
-        <GlobalMapping Global="%Z*" From="ROU"/>
-        <GlobalMapping Global="HLTMP" From="IRISTEMP" />
-        <GlobalMapping Global="TMP" From="IRISTEMP"/>
-        <GlobalMapping Global="UTILITY" From="IRISTEMP" />
-        <GlobalMapping Global="XTMP" From="IRISTEMP"/>
-        <GlobalMapping Global="XUTL" From="IRISTEMP" />
-        <RoutineMapping Routines="%DT" Type="ALL" From="ROU" /> 
-        <RoutineMapping Routines="%DT*" Type="ALL" From="ROU"/>
-        <RoutineMapping Routines="%RCR" Type="ALL" From="ROU"/>
-        <RoutineMapping Routines="%XUCI" Type="ALL" From="ROU"/>
-        <RoutineMapping Routines="%Z*" Type="ALL" From="ROU"/>
-        <RoutineMapping Routines="%" Type="ALL" From="ROU"/>
-        <RoutineMapping Routines="%KIDS*" Type="ALL" From="ROU"/>
-      </Configuration>
-    </Namespace>
 </Manifest>
 }
 

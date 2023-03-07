@@ -4,4 +4,74 @@ ROUTINE %ZSTART
 SYSTEM  ;
     set tSystem=$PIECE($SYSTEM,":",1)
     do $SYSTEM.CSP.SetConfig("CSPConfigName",tSystem)
+    if $SYSTEM.Util.GetEnviron("VX130_STA3N") {
+        do VISTA
+    }
+    set tInstance=$SYSTEM.Util.GetEnviron("IRIS_INSTANCE") {
+        if tInstance="VX130" {
+            do VX130
+        }
+    }
     quit
+VISTA   ; Add VISTA Database
+    set sc=##Class(Config.Databases).Exists("ROU",.tDatabase)
+    if '$ISOBJECT(tDatabase) {
+        set tProperties("Directory")="/irisdb/rou"
+        set sc=##Class(Config.Databases).Create("ROU",.tProperties)
+    }
+    do VAH
+    quit
+VAH ; Add VAH Namespace
+    set sc=##Class(Config.Namespaces).Exists("VAH",.tNamespace)
+    if '$ISOBJECT(tNamespace) {
+        set tProperties("Globals")="ROU"
+        set tProperties("Routines")="ROU"
+        set tProperties("Ensemble")="0"
+        set sc=##Class(Config.Namespaces).Create("VAH",.tProperties)
+    }
+    do GMAP
+    quit
+GMAP    ; Add Global Mappings for VAH
+    set sc=##Class(Config.MapGlobals).Exists("VAH","%Z*",.tGMap)
+    if '$ISOBJECT(tGMap) {
+        set tProperties("Database")="ROU"
+        set sc=##Class(Config.MapGlobals).Create("VAH","%Z*",.tProperties)
+    }
+    for tName="HLTMP","TMP","UTILITY","XTMP","XUTL" {
+        set sc=##Class(Config.MapGlobals).Exists("VAH",tName,.tGMap)
+        if '$ISOBJECT(tGMap) {
+            set tProperties("Database")="IRISTEMP"
+            set sc=##Class(Config.MapGlobals).Create("VAH",tName,.tProperties) 
+        }
+    }
+    do RMAP
+    quit
+RMAP    ; Add Routine Mappings for VAH
+    for tName="%DT","%DT*","%RCR","%XUCI","%Z*","%","%KIDS*" {
+        set sc=##Class(Config.MapRoutines).Exists("VAH",tName,.tRMap)
+        if '$ISOBJECT(tRMap) {
+            set tProperties("Database")="ROU"
+            set sc=##Class(Config.MapRoutines).Create("VAH",tName,.tProperties)
+        }
+    }
+    quit
+VX130   ; Add VX130 Databases
+    for tName="vx130code","vx130data" {
+        set sc=##Class(Config.Databases).Exists(tName,.tDatabase)
+        if '$ISOBJECT(tDatabase) {
+            set tProperties("Directory")="/irisdb/"_tName
+            set sc=##Class(Config.Databases).Create(tName,.tProperties)
+        }
+        do VX130NS
+    }
+    quit
+VX130NS ; Add VX130 Namespace
+    set sc=##Class(Config.Namespaces).Exists("VX130",.tNamespace)
+    if '$ISOBJECT(tNamespace) {
+        set tProperties("Globals")="vx130data"
+        set tProperties("Routines")="vx130code"
+        set tProperties("Ensemble")="0"
+        set sc=##Class(Config.Namespaces).Create("VX130",.tProperties)
+    }
+    quit
+

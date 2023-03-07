@@ -1,5 +1,7 @@
 #!/bin/bash
-docker volume rm vistaextractor_baysys vistaextractor_tamsys vistaextractor_wpbsys
-# docker volume rm vistaextractor_baydb vistaextractor_tamdb vistaextractor_wpbdb
-docker volume rm vistaextractor_bayjrn vistaextractor_tamjrn vistaextractor_wpbjrn
-docker image rm vistaextractor_bay vistaextractor_tam vistaextractor_wpb
+docker volume rm vistaextractor_baysys vistaextractor_tamsys vistaextractor_wpbsys vistaextractor_v08sys vistaextractor_vx130sys
+docker volume rm vistaextractor_baydb vistaextractor_tamdb vistaextractor_wpbdb vistaextractor_v08db vistaextractor_vx130db
+docker volume rm vistaextractor_bayjrn vistaextractor_tamjrn vistaextractor_wpbjrn vistaextractor_v08jrn vistaextractor_vx130jrn
+docker image rm vistaextractor_bay vistaextractor_tam vistaextractor_wpb vistaextractor_v08 vistaextractor_vx130
+docker image rm vistaextractor-bay vistaextractor-tam vistaextractor-wpb vistaextractor-v08 vistaextractor-vx130
+

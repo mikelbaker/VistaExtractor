@@ -14,13 +14,11 @@ services:
     build: .
     volumes:
       - baysys:/irissys
-      #- baydb:/irisdb
-      #- bayjrn:/irisjrn
+      - baydb:/irisdb
+      - bayjrn:/irisjrn
     environment:
       - ISC_DATA_DIRECTORY=/irissys
       - VX130_STA3N=516
-    ports:
-      - 30516:52773
     container_name: bay
     hostname: bay
   tam:
@@ -32,8 +30,6 @@ services:
     environment:
       - ISC_DATA_DIRECTORY=/irissys
       - VX130_STA3N=673
-    ports:
-      - 30673:52773
     container_name: tam
     hostname: tam
   wpb:
@@ -45,10 +41,30 @@ services:
     environment:
       - ISC_DATA_DIRECTORY=/irissys
       - VX130_STA3N=548
-    ports:
-      - 30548:52773
     container_name: wpb
     hostname: wpb
+  v08:
+    build: .
+    volumes:
+      - v08sys:/irissys
+      - v08db:/irisdb
+      - v08jrn:/irisjrn
+    environment:
+      - ISC_DATA_DIRECTORY=/irissys
+      - IRIS_INSTANCE=V08
+    container_name: v08
+    hostname: v08
+  vx130:
+    build: .
+    volumes:
+      - vx130sys:/irissys
+      - vx130db:/irisdb
+      - vx130jrn:/irisjrn
+    environment:
+      - ISC_DATA_DIRECTORY=/irissys
+      - IRIS_INSTANCE=VX130
+    container_name: vx130
+    hostname: vx130
 volumes:
   baysys:
   baydb:
@@ -59,3 +75,9 @@ volumes:
   wpbsys:
   wpbdb:
   wpbjrn:
+  v08sys:
+  v08db:
+  v08jrn:
+  vx130sys:
+  vx130db:
+  vx130jrn:
