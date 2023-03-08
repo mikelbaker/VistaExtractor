@@ -43,6 +43,13 @@ XData v08Manifest [ XMLNamespace = INSTALLER ]
        <GlobalMapping Global="XUTL" From="IRISTEMP"/>
      </Configuration>
    </Namespace>
+   <Namespace  Name="%SYS" Create="no" Code="IRISSYS" Data="IRISSYS"  >
+     <Invoke Class="v08.Installer" Method="EnableMirrorService" CheckStatus="1" />
+     <Invoke Class="v08.Installer" Method="EnableECPService" CheckStatus="1" />
+     <Invoke Class="v08.Installer" Method="AddVX130ECPConnection" CheckStatus="1" />
+     <Invoke Class="v08.Installer" Method="AddVX130RemoteDBs" CheckStatus="1" />
+     <Invoke Class="v08.Installer" Method="AddVX130Namespace" CheckStatus="1" />
+   </Namespace>
 </Manifest>
 }
 
@@ -51,5 +58,98 @@ ClassMethod setup(ByRef pVars, pLogLevel As %Integer = 3, pInstaller As %Install
 {
     #; Let our XGL document generate code for this method. 
     Quit ##class(%Installer.Manifest).%Generate(%compiledclass, %code, "v08Manifest")
+}
+/// Enable the Mirror Service for the AsyncRO system.
+ClassMethod EnableMirrorService() As %Status
+{
+  set tsc = $$$OK
+  try {
+    set tService=##class(Security.Services).%OpenId("%service_mirror")
+    if $ISOBJECT(tService) {
+      set tService.Enabled=1
+      set tsc=tService.%Save()
+    }
+  }
+  catch ex {
+    set tsc=ex.AsStatus()
+  }
+  return tsc
+}
+
+// Enable the ECP Service for the AsyncRO system.
+ClassMethod EnableECPService() As %Status
+{
+  set tsc = $$$OK
+  try {
+    set tService=##class(Security.Services).%OpenId("%service_ecp")
+    if $ISOBJECT(tService) {
+      set tService.Enabled=1
+      set tsc=tService.%Save()
+    }
+  }
+  catch ex {
+    set tsc=ex.AsStatus()
+  }
+  return tsc
+}
+
+// Add ECP connection to VX130 for the AsyncRO system.
+ClassMethod AddVX130ECPConnection() As %Status
+{
+  set tsc = $$$OK
+  try {
+    if ##Class(Config.ECPServers).Exists("vx130",.Obj) {
+        do ##class(%SYS.System).WriteToConsoleLog("vx130 ECP connection is already configured.")
+      } else {
+        set tProperties("Address")="vx130"
+        set tProperties("Port")="1972"
+        set tsc=##Class(Config.ECPServers).Create("vx130",.tProperties)
+      }
+  }
+  catch ex {
+    set tsc=ex.AsStatus()
+  }
+  return tsc
+}
+
+// Add Remote databases to VX130 for the AsyncRO system.
+ClassMethod AddVX130RemoteDBs() As %Status
+{
+  set tsc = $$$OK
+  try {
+    for tName="vx130code","vx130data"
+    {
+      if ##Class(Config.Databases).Exists(tName,.Obj) {
+        do ##class(%SYS.System).WriteToConsoleLog(tName_" is already configured.")
+      } else {
+        set tProperties("Directory")="/irisdb/vx130/"_tName_"/"
+        set tProperties("Server")="vx130"
+        set tsc=##Class(Config.Databases).Create(tName,.tProperties)
+      }
+    }
+  }
+  catch ex {
+    set tsc=ex.AsStatus()
+  }
+  return tsc
+}
+
+// Add VX130 Namespace for the AsyncRO system.
+ClassMethod AddVX130Namespace() As %Status
+{
+  set tsc = $$$OK
+  try {
+    if ##Class(Config.Namespaces).Exists("VX130",.Obj) {
+      do ##class(%SYS.System).WriteToConsoleLog("VX130 Namespace is already configured.")
+    } else {
+      set tProperties("Routines")="vx130code"
+      set tProperties("Globals")="vx130data"
+      set tsc=##Class(Config.Namespaces).Create("VX130",.tProperties)
+    }
+  }
+  catch ex {
+    set tsc=ex.AsStatus()
+  }
+  return tsc
 }
 }

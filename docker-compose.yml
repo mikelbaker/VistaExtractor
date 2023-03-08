@@ -64,6 +64,7 @@ services:
       - ./vx130/sys:/irissys
       - ./vx130/db:/irisdb
       - ./vx130/jrn:/irisjrn
+      - ./vx130/code:/code
     environment:
       - ISC_DATA_DIRECTORY=/irissys
       - IRIS_INSTANCE=VX130

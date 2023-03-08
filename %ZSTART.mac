@@ -24,8 +24,8 @@ SYSTEM  ;
         if ##class(Config.Namespaces).Exists("WPB") {
             do ##class(%SYS.System).WriteToConsoleLog("V08 system already configured.")
         } else {
-             do ##class(%SYS.System).WriteToConsoleLog("Start V08 Configuration.")
-             if ##class(%File).Exists("/code/v08Installer.cls") {
+            do ##class(%SYS.System).WriteToConsoleLog("Start V08 Configuration.")
+            if ##class(%File).Exists("/code/v08Installer.cls") {
                 do $SYSTEM.OBJ.Load("/code/v08Installer.cls","cuk")
                 do ##class(v08.Installer).setup()
                 do ##class(%SYS.System).WriteToConsoleLog("End V08 Configuration.")
@@ -33,5 +33,19 @@ SYSTEM  ;
                 do ##class(%SYS.System).WriteToConsoleLog("Installer not found.")
             }
         }
+    } elseif tInstance="VX130" {
+        if ##class(Config.Namespaces).Exists("VX130") { 
+            do ##class(%SYS.System).WriteToConsoleLog("VX130 system already configured.")
+        } else {
+            do ##class(%SYS.System).WriteToConsoleLog("Start VX130 Configuration.")
+            if ##class(%File).Exists("/code/vx130Installer.cls") {
+                do $SYSTEM.OBJ.Load("/code/vx130Installer.cls","cuk")
+                do ##class(vx130.Installer).setup()
+                do ##class(%SYS.System).WriteToConsoleLog("End VX130 Configuration.")
+            } else {
+                do ##class(%SYS.System).WriteToConsoleLog("Installer not found.")
+            }
+        }
     }
+    quit
     

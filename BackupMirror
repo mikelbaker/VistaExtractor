@@ -1,0 +1,18 @@
+#!/bin/bash
+docker exec -it v08 iris stop IRIS quietly
+docker exec -it bay iris stop IRIS quietly
+docker exec -it tam iris stop IRIS quietly
+docker exec -it wpb iris stop IRIS quietly
+
+sudo rsync -ah --progress ./bay/db/rou/IRIS.DAT ./v08/db/v08/bay/rou/IRIS.DAT
+sudo rsync -ah --progress ./tam/db/rou/IRIS.DAT ./v08/db/v08/tam/rou/IRIS.DAT
+sudo rsync -ah --progress ./wpb/db/rou/IRIS.DAT ./v08/db/v08/wpb/rou/IRIS.DAT
+
+docker exec -it --user root v08 chown irisowner:irisowner /irisdb/v08/bay/rou/IRIS.DAT
+docker exec -it --user root v08 chown irisowner:irisowner /irisdb/v08/tam/rou/IRIS.DAT
+docker exec -it --user root v08 chown irisowner:irisowner /irisdb/v08/wpb/rou/IRIS.DAT
+
+docker exec -it bay iris start IRIS
+docker exec -it tam iris start IRIS
+docker exec -it wpb iris start IRIS
+docker exec -it v08 iris start IRIS
