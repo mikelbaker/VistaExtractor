@@ -6,4 +6,5 @@ tam/*
 wpb/*
 v08/*
 vx130/*
-CSP.log
+web/webgateway/CSP.log
+accessToken.txt

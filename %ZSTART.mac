@@ -19,4 +19,19 @@ SYSTEM  ;
             }
         }
     }
+    set tInstance=$SYSTEM.Util.GetEnviron("IRIS_INSTANCE")
+    if tInstance="V08" {
+        if ##class(Config.Namespaces).Exists("WPB") {
+            do ##class(%SYS.System).WriteToConsoleLog("V08 system already configured.")
+        } else {
+             do ##class(%SYS.System).WriteToConsoleLog("Start V08 Configuration.")
+             if ##class(%File).Exists("/code/v08Installer.cls") {
+                do $SYSTEM.OBJ.Load("/code/v08Installer.cls","cuk")
+                do ##class(v08.Installer).setup()
+                do ##class(%SYS.System).WriteToConsoleLog("End V08 Configuration.")
+            } else {
+                do ##class(%SYS.System).WriteToConsoleLog("Installer not found.")
+            }
+        }
+    }
     
