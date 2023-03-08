@@ -20,7 +20,9 @@ Index JournalFileNameIndex On JournalFileName [ Unique ];
 
 Index MirrorSystemIndex On MirrorSystem;
 
-/// Description
+/// Get the Known journalfiles in reverse order.  If file is
+/// not found add it to the class.  If it is found and it is not
+/// the first file in the list then we know that file has been closed.
 ClassMethod AddFiles(pMirror As %String) As %Status
 {
     set tsc = $$$OK
