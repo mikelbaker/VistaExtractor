@@ -4,12 +4,11 @@ docker exec -it tam iris stop IRIS quietly
 docker exec -it wpb iris stop IRIS quietly
 
 sudo rsync -ah --progress IRIS.DAT ./bay/db/rou/
-docker exec -it --user root bay chown irisowner:irisowner /irisdb/rou/IRIS.DAT
-
 sudo rsync -ah --progress IRIS.DAT ./tam/db/rou/
-docker exec -it --user root tam chown irisowner:irisowner /irisdb/rou/IRIS.DAT
-
 sudo rsync -ah --progress IRIS.DAT ./wpb/db/rou/
+
+docker exec -it --user root bay chown irisowner:irisowner /irisdb/rou/IRIS.DAT
+docker exec -it --user root tam chown irisowner:irisowner /irisdb/rou/IRIS.DAT
 docker exec -it --user root wpb chown irisowner:irisowner /irisdb/rou/IRIS.DAT
 
 docker exec -it bay iris start IRIS

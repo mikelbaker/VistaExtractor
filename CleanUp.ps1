@@ -51,7 +51,8 @@ docker exec -it --user root vx130 chown -R irisowner:irisowner /irisdb /irisjrn 
 docker cp vistaInstaller.cls bay:/code/
 docker cp vistaInstaller.cls tam:/code/
 docker cp vistaInstaller.cls wpb:/code/
-docker cp v08Installer.cls v08:/code
+docker cp v08Installer.cls v08:/code/
+docker cp vx130Installer.cls vx130:/code/
 
 docker stop bay
 docker stop tam

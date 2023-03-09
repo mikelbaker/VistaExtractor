@@ -23,7 +23,7 @@ Index MirrorSystemIndex On MirrorSystem;
 /// Get the Known journalfiles in reverse order.  If file is
 /// not found add it to the class.  If it is found and it is not
 /// the first file in the list then we know that file has been closed.
-ClassMethod AddFiles(pMirror As %String) As %Status
+ClassMethod AddMirrorFiles(pMirror As %String) As %Status
 {
     set tsc = $$$OK
     set tCnt=0
@@ -51,6 +51,23 @@ ClassMethod AddFiles(pMirror As %String) As %Status
                 set tRef.JournalFileCreated=tRSet.%Get("Creation Time")
                 set tsc=tRef.%Save()
             }
+        }
+    }
+    catch ex {
+        set tsc=ex.AsStatus()
+    }
+    return tsc
+}
+
+/// Description
+ClassMethod AddFiles() As %Status
+{
+    set tsc = $$$OK
+    try {
+        set tMirrorList=##class(%SYSTEM.Mirror).GetMirrorNames()
+        for tCnt=1:1:$LISTLENGTH(tMirrorList) {
+            set tMirror=$LIST(tMirrorList,tCnt)
+            set tsc=..AddMirrorFiles(tMirror)
         }
     }
     catch ex {
