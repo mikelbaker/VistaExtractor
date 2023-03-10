@@ -16,9 +16,20 @@ Property JournalFileClosed As %Boolean;
 /// The date and time the Journal file was created on the mirror.
 Property JournalFileCreated As %TimeStamp;
 
+/// Has the entire file been read by JournalReader?  If yes means the
+/// journal file was closed and that every record has been read and
+/// evaluated.
+Property EntireFileRead As %Boolean;
+
+Property CurrentlyReadingFile As %Boolean;
+
+Property IRISInstance As VX130.IRISInstance;
+
 Index JournalFileNameIndex On JournalFileName [ Unique ];
 
 Index MirrorSystemIndex On MirrorSystem;
+
+Index EntireFileReadIndex On (EntireFileRead, CurrentlyReadingFile, IRISInstance);
 
 /// Get the Known journalfiles in reverse order.  If file is
 /// not found add it to the class.  If it is found and it is not
@@ -28,6 +39,7 @@ ClassMethod AddMirrorFiles(pMirror As %String) As %Status
     set tsc = $$$OK
     set tCnt=0
     try {
+        set tInstanceID=##class(VX130.IRISInstance).GetInstanceID()
         set tRSet = ##class(%ResultSet).%New("%SYS.Journal.File:MirrorByTimeReverseOrder")
         set tsc=tRSet.%Execute("",pMirror)
         while tRSet.%Next() {
@@ -41,7 +53,7 @@ ClassMethod AddMirrorFiles(pMirror As %String) As %Status
                     set tRef.JournalFileClosed=1
                     set tsc=tRef.%Save()
                 }
-            } else {
+} else {
                 set tRef=..%New()
                 set tRef.JournalFileName=tJournalFileName
                 set tRef.MirrorSystem=pMirror
@@ -49,6 +61,7 @@ ClassMethod AddMirrorFiles(pMirror As %String) As %Status
                     set tRef.JournalFileClosed=1
                 }
                 set tRef.JournalFileCreated=tRSet.%Get("Creation Time")
+                set tRef.IRISInstance=##class(VX130.IRISInstance).%OpenId(tInstanceID,0)
                 set tsc=tRef.%Save()
             }
         }
@@ -59,7 +72,9 @@ ClassMethod AddMirrorFiles(pMirror As %String) As %Status
     return tsc
 }
 
-/// Description
+/// Get a list of all of the mirrors on this system and then for each
+/// mirror name call AddMirrorFiles method passing the mirror name to 
+/// add journalfiles to the table.
 ClassMethod AddFiles() As %Status
 {
     set tsc = $$$OK
@@ -74,6 +89,63 @@ ClassMethod AddFiles() As %Status
         set tsc=ex.AsStatus()
     }
     return tsc
+}
+
+/// Description
+ClassMethod GetID(pJournalFileName As %String) As %String
+{
+    &sql(SELECT ID INTO :tID FROM VX130.JournalFile WHERE JournalFileName=:pJournalFileName)
+    Return $GET(tID)
+}
+
+/// Description
+ClassMethod SetCurrentlyReadingFile(pJournalFileName As %String) As %Status
+{
+    Set tsc = $$$OK
+    Try {
+        &sql(UPDATE VX130.JournalFile SET CurrentlyReadingFile=1 WHERE JournalFileName=:pJournalFileName)
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tsc
+}
+
+/// Description
+ClassMethod RemoveCurrentlyReadingFile(pJournalFileName As %String, pEndOffset As %Integer) As %Status
+{
+    Set tsc = $$$OK
+    Try {
+        &sql(UPDATE VX130.JournalFile SET CurrentlyReadingFile=NULL WHERE JournalFileName=:pJournalFileName)
+        &sql(SELECT JournalFileClosed INTO :tClosed FROM VX130.JournalFile WHERE JournalFileName=:pJournalFileName)
+        if $GET(tClosed) {
+            set tJFile=##class(%SYS.Journal.File).%OpenId(pJournalFileName)
+            if $ISOBJECT(tJFile) {
+                set tLastOffset=tJFile.LastRecord.Address
+                kill tJFile
+            }
+            if pEndOffset=tLastOffset {
+                 &sql(UPDATE VX130.JournalFile SET EntireFileRead=1 WHERE JournalFileName=:pJournalFileName)
+            }
+        }
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tsc
+}
+
+/// Description
+ClassMethod SetEntireFileRead(pJournalFileName) As %Status
+{
+    Set tsc = $$$OK
+    Try {
+        &sql(UPDATE VX130.JournalFile SET EntireFileRead=1 WHERE JournalFileName=:pJournalFileName)
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tsc
 }
 
 Storage Default
@@ -93,6 +165,15 @@ Storage Default
 </Value>
 <Value name="5">
 <Value>JournalFileCreated</Value>
+</Value>
+<Value name="6">
+<Value>EntireFileRead</Value>
+</Value>
+<Value name="7">
+<Value>CurrentlyReadingFile</Value>
+</Value>
+<Value name="8">
+<Value>IRISInstance</Value>
 </Value>
 </Data>
 <DataLocation>^VX130.JournalFileD</DataLocation>
