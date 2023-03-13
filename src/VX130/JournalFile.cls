@@ -91,14 +91,16 @@ ClassMethod AddFiles() As %Status
     return tsc
 }
 
-/// Description
+/// Using the given journal file name return the id of the record in
+/// VX130.Journalfile.
 ClassMethod GetID(pJournalFileName As %String) As %String
 {
     &sql(SELECT ID INTO :tID FROM VX130.JournalFile WHERE JournalFileName=:pJournalFileName)
     Return $GET(tID)
 }
 
-/// Description
+/// Using the given journal file name set the CurrentlyReadingFile property
+/// to true for the record in VX130.JournalFile.
 ClassMethod SetCurrentlyReadingFile(pJournalFileName As %String) As %Status
 {
     Set tsc = $$$OK
@@ -111,7 +113,8 @@ ClassMethod SetCurrentlyReadingFile(pJournalFileName As %String) As %Status
     Return tsc
 }
 
-/// Description
+/// Using the given journal file name set the CurrentlyReadingFile property
+/// to null for the record in VX130.JournalFile
 ClassMethod RemoveCurrentlyReadingFile(pJournalFileName As %String, pEndOffset As %Integer) As %Status
 {
     Set tsc = $$$OK
@@ -135,7 +138,8 @@ ClassMethod RemoveCurrentlyReadingFile(pJournalFileName As %String, pEndOffset A
     Return tsc
 }
 
-/// Description
+/// Using the given journal file name set the EntireFileRead property
+/// to true for the record in VX130.JournalFile
 ClassMethod SetEntireFileRead(pJournalFileName) As %Status
 {
     Set tsc = $$$OK

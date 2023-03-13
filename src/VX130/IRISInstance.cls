@@ -1,26 +1,27 @@
+/// A list of all IRIS instances known to the VX130 system.
 Class VX130.IRISInstance Extends %Persistent
 {
 
-/// Description
+/// A unique id for the IRIS instance.
 Property InstanceID As %Integer;
 
 /// The name of the instance or if a container the container name.
 Property InstanceName As %String;
 
-/// Description
+/// The port of the IRIS webserver for the instance.
 Property WebserverPort As %Integer;
 
-/// Description
+/// The port of the IRIS super server for the instance.
 Property SuperServerPort As %Integer;
 
-/// Description
+/// The IPAddress for the IRIS instance or container.
 Property IPAddress As %String;
 
 Index MainIndex On InstanceID [ IdKey, PrimaryKey, Unique ];
 
 Index InstanceNameIndex On InstanceName [ Unique ];
 
-/// Description
+/// Add some intial records to the VX130.IRISInstance table.
 ClassMethod Init() As %Status
 {
     Set tsc = $$$OK

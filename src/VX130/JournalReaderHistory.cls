@@ -1,34 +1,37 @@
+/// This class contains the record of when and where the JournalReader
+/// started, how many records were read and evaluated and when and where
+/// the JournalReader stopped.
 Class VX130.JournalReaderHistory Extends %Persistent
 {
 
-/// Description
+/// A link to the VX130.JournalFile object.
 Property JournalFile As VX130.JournalFile;
 
-/// Description
+/// The starting address for the JournalReader in the journal file.
 Property StartOffset As %Integer;
 
-/// Description
+/// The starting date and time for the JournalReader in the journal file.
 Property StartDateTime As %TimeStamp;
 
-/// Description
+/// The number of records read from the start offset to the ending offset.
 Property NumberOfRecordsRead As %Integer;
 
-/// Description
+/// The number of records that were found that are in GlobalsToWatch.
 Property NumberOfRecordsFound As %Integer;
 
-/// Description
+/// The ending address for the JournalReader in the journal file.
 Property EndOffSet As %Integer;
 
-/// Description
+/// The ending date and time for the JournalReader in the journal file.
 Property EndDateTime As %TimeStamp;
 
-/// Description
+/// A link to the VX130.VistaSite object for this journal file.
 Property VistaSite As VX130.VistaSite;
 
-/// Description
 Index JournalFileIndex On JournalFile;
 
-/// Description
+/// For a given journal file find the last record read in the JournalFileHistory.
+/// If no record is found return a zero to start at the beginning of the file.
 ClassMethod GetStartOffset(pJournalFileName, ByRef tsc As %Status) As %Integer
 {
     set tsc=$$$OK
@@ -42,7 +45,8 @@ ClassMethod GetStartOffset(pJournalFileName, ByRef tsc As %Status) As %Integer
     return tStartOffset
 }
 
-/// Description
+/// This method is called when a JournalReader is started to add an entry
+/// to the JournalReaderHistory.
 ClassMethod Add(pJournalFileName As %String, pSta3n As %Integer, pStartOffset As %Integer) As %Status
 {
     Set tsc = $$$OK
@@ -73,7 +77,8 @@ ClassMethod Add(pJournalFileName As %String, pSta3n As %Integer, pStartOffset As
     Return tsc
 }
 
-/// Description
+/// This method is called when a JournalReader has finished reading a 
+/// journal file to close out the history that the JournalReader started.
 ClassMethod End(pJournalFileName As %String, pSta3n As %Integer, pEndOffset As %Integer, tRecordsRead As %Integer) As %Status
 {
     Set tsc = $$$OK
