@@ -1,0 +1,2 @@
+#!/bin/bash
+docker exec -it vx130 iris session iris -U vx130 "##class(%SYSTEM.OBJ).LoadDir(\"/code/src/\",\"ckuk\",,1)"
