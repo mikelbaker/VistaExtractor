@@ -1,17 +1,17 @@
-Class Dim.VistaFieldv001 Extends %Persistent
+Class Dim.VistaFieldv001 Extends (%Persistent, %JSON.Adaptor)
 {
 
 /// The three digit Station Number.
 Property Sta3n As %Integer;
 
 /// Embedded reference to vxVX130130.VistaSite ;
-Property VistaSite As VX130.VistaSite;
+Property VistaSite As VX130.VistaSite(%JSONINCLUDE = "INPUTONLY");
 
 /// The VISTA file number
 Property VistaFileNumber As %String(COLLATION = "EXACT");
 
 /// Embedded reference to Dim.VistaFilev001
-Property VistaFile As Dim.VistaFilev001;
+Property VistaFile As Dim.VistaFilev001(%JSONINCLUDE = "INPUTONLY");
 
 /// The VISTA field number
 Property VistaFieldNumber As %String;
@@ -23,28 +23,28 @@ Property VistaFieldName As %String;
 Property VistaFieldType As %String;
 
 /// If the VISTA field type is FreeText this is the MAXLEN
-Property VistaFieldLength As %String;
+Property VistaFieldLength As %String(%JSONINCLUDE = "INPUTONLY");
 
 /// If the VISTA field type is SetOfCodes this is the code string
-Property VistaFieldCodes As %String(MAXLEN = 2000);
+Property VistaFieldCodes As %String(%JSONINCLUDE = "INPUTONLY", MAXLEN = 2000);
 
 /// If the VISTA field type is Numeric this is the length and scale.
-Property VistaFieldNumericScale As %String;
+Property VistaFieldNumericScale As %String(%JSONINCLUDE = "INPUTONLY");
 
 /// If the VISTA field type is SubFile this is the sub-file number.
 Property VistaMultipleFileNumber As %String;
 
 /// Embeded reference to VistaFile if the VISTA field type is SubFile.
-Property VistaMultipleFile As Dim.VistaFilev001;
+Property VistaMultipleFile As Dim.VistaFilev001(%JSONINCLUDE = "INPUTONLY");
 
 /// If the VISTA field type is Pointer this is the Pointed to Vista file number.
 Property VistaPointedToFileNumber As %String;
 
 /// Embeded reference to VistaFile if the VISTA field type is Pointer.
-Property PointerToVistaFile As Dim.VistaFilev001;
+Property PointerToVistaFile As Dim.VistaFilev001(%JSONINCLUDE = "INPUTONLY");
 
 /// The Vista Field Description.
-Property VistaFieldDescription As %String(MAXLEN = 20000);
+Property VistaFieldDescription As %String(%JSONINCLUDE = "INPUTONLY", MAXLEN = 20000);
 
 /// The global node that contains data for this field
 Property GlobalNode As %String(MAXLEN = 2000);
@@ -54,13 +54,13 @@ Property Piece As %String;
 
 /// If the record was deleted in VISTA this property
 /// will be set to D otherwise this property is NULL.
-Property OpCode As %String;
+Property OpCode As %String(%JSONINCLUDE = "INPUTONLY");
 
 /// The first time this record was updated.
-Property VistaCreateDate As %TimeStamp;
+Property VistaCreateDate As %TimeStamp(%JSONINCLUDE = "INPUTONLY");
 
 /// The last time this record was updated.
-Property VistaEditDate As %TimeStamp;
+Property VistaEditDate As %TimeStamp(%JSONINCLUDE = "INPUTONLY");
 
 /// Unique index to quickly find the record for the VISTA file.
 Index MainIndex On (Sta3n, VistaFileNumber, VistaFieldNumber) [ Unique ];
@@ -434,6 +434,24 @@ Method setVistaFieldNumericScale(pNS As %String, pVistaFileNumber As %String, pV
         }
     }
     Return tFlag
+}
+
+ClassMethod GetSiteFieldList(pSta3n As %Integer, pVistaFileNumber As %String, ByRef tsc As %Status) As %DynamicArray
+{
+    Set tsc = $$$OK
+    Try {
+        set tSQL="SELECT ID FROM Dim.VistaFieldv001 WHERE Sta3n=? AND VistaFileNumber=? AND OpCode IS NULL"
+        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,pSta3n,pVistaFileNumber)
+        set tFieldArray=##class(%DynamicArray).%New()
+        while tRSet.%Next() {
+            do ..%OpenId(tRSet.%Get("ID")).%JSONExportToString(.tField)
+            do tFieldArray.%Push(tField)
+        }
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tFieldArray
 }
 
 Storage Default

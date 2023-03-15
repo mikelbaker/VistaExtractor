@@ -1,11 +1,11 @@
-Class Dim.VistaFilev001 Extends %Persistent
+Class Dim.VistaFilev001 Extends (%Persistent, %JSON.Adaptor)
 {
 
 /// The three digit Station Number.
 Property Sta3n As %Integer;
 
 /// Embedded reference to VX130.VistaSite ;
-Property VistaSite As VX130.VistaSite;
+Property VistaSite As VX130.VistaSite(%JSONINCLUDE = "INPUTONLY");
 
 /// The VISTA file number
 Property VistaFileNumber As %String(COLLATION = "EXACT");
@@ -14,23 +14,23 @@ Property VistaFileNumber As %String(COLLATION = "EXACT");
 Property VistaFileName As %String(COLLATION = "EXACT", MAXLEN = 250);
 
 /// The description for the VISTA file.
-Property VistaFileDescription As %String(MAXLEN = 20000);
+Property VistaFileDescription As %String(%JSONINCLUDE = "INPUTONLY", MAXLEN = 20000);
 
 /// The parent File of the VISTA sub-file
-Property ParentVistaFile As Dim.VistaFilev001;
+Property ParentVistaFile As Dim.VistaFilev001(%JSONINCLUDE = "INPUTONLY");
 
 /// The global root of the VISTA file
 Property GlobalRoot As %String(COLLATION = "EXACT");
 
 /// If the record was deleted in VISTA this property
 /// will be set to D otherwise this property is NULL.
-Property OpCode As %String;
+Property OpCode As %String(%JSONINCLUDE = "INPUTONLY");
 
 /// The first time this record was updated.
-Property VistaCreateDate As %TimeStamp;
+Property VistaCreateDate As %TimeStamp(%JSONINCLUDE = "INPUTONLY");
 
 /// The last time this record was updated.
-Property VistaEditDate As %TimeStamp;
+Property VistaEditDate As %TimeStamp(%JSONINCLUDE = "INPUTONLY");
 
 /// Unique index to quickly find the record for the VISTA file.
 Index MainIndex On (Sta3n, VistaFileNumber) [ Unique ];
@@ -238,6 +238,25 @@ Method setGlobalRoot(pNS As %String, pVistaFileNumber As %String) As %Integer
         Set tFlag=1
     }
     Return tFlag
+}
+
+/// Description
+ClassMethod GetFileInfo(pSta3n As %Integer, pVistaFileNumber As %String, ByRef tsc As %Status) As %DynamicObject
+{
+    Set tsc = $$$OK
+    Try {
+        set tSQL="SELECT ID FROM Dim.VistaFilev001 WHERE Sta3n=? AND VistaFileNumber=? AND OpCode IS NULL"
+        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,pSta3n,pVistaFileNumber)
+        
+        while tRSet.%Next() {
+            do ..%OpenId(tRSet.%Get("ID")).%JSONExportToString(.tFile)
+        }
+        set tFile=##class(%DynamicObject).%New().%FromJSON(tFile)
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tFile
 }
 
 Storage Default

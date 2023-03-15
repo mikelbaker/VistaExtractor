@@ -1,5 +1,5 @@
 /// Information about a VISTA site that is used by VX130.
-Class VX130.VistaSite Extends %Persistent
+Class VX130.VistaSite Extends (%Persistent, %JSON.Adaptor)
 {
 
 /// THe unique station number of a VISTA system
@@ -15,7 +15,7 @@ Property SiteName As %String;
 Property VISN As %Integer;
 
 /// The IRISINstance that mirrors this VISTA site'd databases.
-Property IRISInstance As VX130.IRISInstance;
+Property IRISInstance As VX130.IRISInstance(%JSONINCLUDE = "INPUTONLY");
 
 Index MainIndex On Sta3n [ IdKey, PrimaryKey, Unique ];
 
@@ -43,6 +43,25 @@ ClassMethod GetSta3n(pSta3a As %String) As %String
 {
     &sql(SELECT Sta3n INTO :tSta3n FROM VX130.VistaSite where Sta3a=:pSta3a)
     return $GET(tSta3n)
+}
+
+/// Description
+ClassMethod GetSiteList(ByRef tsc As %Status) As %DynamicArray
+{
+    Set tsc = $$$OK
+    Try {
+        set tSQL="SELECT Sta3n FROM VX130.VistaSite"
+        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL)
+        set tSiteArray=##class(%DynamicArray).%New()
+        while tRSet.%Next() {
+            do ..%OpenId(tRSet.%Get("Sta3n")).%JSONExportToString(.tSite)
+            do tSiteArray.%Push(tSite)
+        }
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tSiteArray
 }
 
 /// Description

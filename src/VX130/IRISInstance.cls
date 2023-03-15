@@ -1,5 +1,5 @@
 /// A list of all IRIS instances known to the VX130 system.
-Class VX130.IRISInstance Extends %Persistent
+Class VX130.IRISInstance Extends (%Persistent, %JSON.Adaptor)
 {
 
 /// A unique id for the IRIS instance.

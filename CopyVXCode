@@ -9,3 +9,11 @@ docker exec -it v08 iris session iris -U vx130 "##class(VX130Task.AddJournalFile
 docker exec -it v08 iris session iris -U vx130 "##class(VX130Task.JournalReaderTask).ScheduleEveryMinute()"
 
 docker exec -it v08 iris session iris -U vx130 "##class(VX130.JournalReaderStatus).Init()"
+
+docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFilev001).BuildSite(516)"
+docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFilev001).BuildSite(548)"
+docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFilev001).BuildSite(673)"
+
+docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFieldv001).BuildSite(516)"
+docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFieldv001).BuildSite(548)"
+docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFieldv001).BuildSite(673)"
