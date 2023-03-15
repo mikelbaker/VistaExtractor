@@ -1,12 +1,12 @@
 /// Task to Add the mirror journal files to the VX130.JournalFile table.
-Class VX130Task.AddJournalFileTask Extends %SYS.Task.Definition
+Class VX130Task.JournalReaderTask Extends %SYS.Task.Definition
 {
 
 /// Code to run when the task is started.
 Method OnTask() As %Status
 {
     set tsc = $$$OK
-    set tsc=##class(VX130.JournalFile).AddFiles()
+    set tsc=##class(VX130.JournalReader).Start()
     return tsc
 }
 
@@ -16,7 +16,7 @@ ClassMethod ScheduleEveryMinute() As %Status
     #Dim tTask As %SYS.Task
     Set tsc = $$$OK
     Try {
-        set tName="VX130-AddJournalFiles"
+        set tName="VX130-JournalReader"
         &sql(SELECT ID INTO :tID FROM %SYS.Task WHERE Name=:tName)
         if $GET(tID) {
             set tsc=$SYSTEM.Status.Error(5001, tName_" Task already defined.","Did not add another." )

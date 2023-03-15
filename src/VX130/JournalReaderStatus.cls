@@ -6,7 +6,7 @@ Class VX130.JournalReaderStatus Extends %Persistent
 Property IRISInstance As VX130.IRISInstance;
 
 /// True means run.
-/// Anything else means stop.
+/// else means stop.
 Property RunFlag As %Boolean;
 
 /// A string that will be populated with the overall health of a 

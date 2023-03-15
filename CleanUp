@@ -1,5 +1,5 @@
 #!/bin/bash
-docker-compose down
+docker compose down
 docker image rm vistaextractor_bay vistaextractor_tam vistaextractor_wpb vistaextractor_v08 vistaextractor_vx130
 
 sudo rm -rf bay
@@ -14,11 +14,11 @@ mkdir -p wpb/code wpb/db/rou wpb/jrn/jrn wpb/jrn/alt
 mkdir -p v08/code v08/db/v08/bay/rou v08/db/v08/tam/rou v08/db/v08/wpb/rou v08/jrn/jrn v08/jrn/alt
 mkdir -p vx130/code vx130/db/vx130/vx130code vx130/db/vx130/vx130data vx130/jrn/jrn vx130/jrn/alt
 
-docker run -v ./bay/code:/code -v ./bay/sys:/irissys -v ./bay/db:/irisdb -v ./bay/jrn:/irisjrn --name bay -d intersystems/iris:2022.1.2.574.0
-docker run -v ./tam/code:/code -v ./tam/sys:/irissys -v ./tam/db:/irisdb -v ./tam/jrn:/irisjrn --name tam -d intersystems/iris:2022.1.2.574.0
-docker run -v ./wpb/code:/code -v ./wpb/sys:/irissys -v ./wpb/db:/irisdb -v ./wpb/jrn:/irisjrn --name wpb -d intersystems/iris:2022.1.2.574.0
-docker run -v ./v08/code:/code -v ./v08/sys:/irissys -v ./v08/db:/irisdb -v ./v08/jrn:/irisjrn --name v08 -d intersystems/iris:2022.1.2.574.0
-docker run -v ./vx130/code:/code -v ./vx130/sys:/irissys -v ./vx130/db:/irisdb -v ./vx130/jrn:/irisjrn --name vx130 -d intersystems/iris:2022.1.2.574.0
+docker run -v ./bay/code:/code -v ./bay/sys:/irissys -v ./bay/db:/irisdb -v ./bay/jrn:/irisjrn --name bay -d intersystems/iris:2023.1.0.207.0
+docker run -v ./tam/code:/code -v ./tam/sys:/irissys -v ./tam/db:/irisdb -v ./tam/jrn:/irisjrn --name tam -d intersystems/iris:2023.1.0.207.0
+docker run -v ./wpb/code:/code -v ./wpb/sys:/irissys -v ./wpb/db:/irisdb -v ./wpb/jrn:/irisjrn --name wpb -d intersystems/iris:2023.1.0.207.0
+docker run -v ./v08/code:/code -v ./v08/sys:/irissys -v ./v08/db:/irisdb -v ./v08/jrn:/irisjrn --name v08 -d intersystems/iris:2023.1.0.207.0
+docker run -v ./vx130/code:/code -v ./vx130/sys:/irissys -v ./vx130/db:/irisdb -v ./vx130/jrn:/irisjrn --name vx130 -d intersystems/iris:2023.1.0.207.0
 sleep 20
 
 docker exec -it --user root bay chown -R irisowner:irisowner /irisdb /irisjrn /irissys /code
@@ -44,7 +44,7 @@ docker rm bay
 docker rm tam
 docker rm wpb
 docker rm v08
-
+docker rm vx130
 
 
 
