@@ -70,3 +70,13 @@ services:
       - IRIS_INSTANCE=VX130
     container_name: vx130
     hostname: vx130
+  swagger:
+    image: swaggerapi/swagger-ui
+    volumes:
+      - ./apis:/apis
+    environment:
+      - SWAGGER_JSON=/apis/cb.json 
+    ports:
+      - 8080:8080
+    container_name: swagger
+    hostname: swagger
