@@ -58,3 +58,13 @@ v08: http://localhost/v08/csp/sys/op/%25CSP.UI.Portal.Mirror.Monitor.zen
 
 next you will need to load the VistaExtractor code into the VX130 database server.  You can run the script CopyVXCode
 
+    ./CopyVXCode
+
+
+Create the ClassBuilder APIS
+1.  Using Postman create the APIs using the OpenAPI defintion in ./apis/cb.json
+    a. Copy the ./apis/cb.json file and paste in postman body.
+    b. set the url to http://localhost/vx130/api/mgmnt/v2/VX130/CB
+    c. Set the TYPE to POST
+    d. Set the Authentication to basic and add your username and password.
+    

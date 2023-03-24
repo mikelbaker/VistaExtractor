@@ -1,5 +1,5 @@
 {
-    "host" : "52.152.220.253",
+    "host" : "localhost",
     "info": {
         "title": "",
         "description": "",
@@ -11,6 +11,14 @@
         "/sites": {
             "get": {
                 "operationId": "GetSites",
+                "security": [
+                    {
+                        "basicAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                  ],
                 "description": " Obtain a list of station numbers and station abbreviations.",
                 "x-ISC_ServiceMethod": "GetSites",
                 "responses": {
@@ -18,7 +26,10 @@
                         "description": "(Unexpected Error)"
                     },
                     "200": {
-                        "description": "(Expected Result)"
+                        "description": "(Expected Result)",
+                        "schema": {
+                            "$ref": "#/definitions/Sites"
+                          }
                     }
                 }
             }
@@ -76,11 +87,90 @@
                         "description": "(Unexpected Error)"
                     },
                     "200": {
-                        "description": "(Expected Result)"
+                        "description": "(Expected Result)",
+                        "schema": {
+                            "$ref": "#/definitions/Fields"
+                          }
                     }
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "basicAuth": {
+            "type": "basic"
+        }
+    },
+    "definitions": {
+        "Sites": {
+          "type": "object",
+          
+          "properties": {
+            "Site": {
+              "type": "array",
+                "xml": {
+                  "wrapped": true
+                    },
+                  "items": {
+                    "xml": {
+                     "name": "Site"
+                    },
+                    "$ref": "#/definitions/Site"
+                  }
+            }
+          }
+ 
+        },
+        "Site": {
+          "type": "object",
+          "properties": {
+            "Sta3n" : {
+              "type": "string"
+            },
+            "Sta3a" : {
+               "type": "string"
+            }
+          }
+        },
+
+        "Fields": {
+            "type": "object",
+            
+            "properties": {
+              "Field": {
+                "type": "array",
+                  "xml": {
+                    "wrapped": true
+                      },
+                    "items": {
+                      "xml": {
+                       "name": "Field"
+                      },
+                      "$ref": "#/definitions/Field"
+                    }
+              }
+            }
+          },
+          "Field": {
+            "type": "object",
+            "properties": {
+              "id" : {
+                "type": "string"
+              },
+              "FMFileNumber" : {
+                 "type": "string"
+              },
+              "FMFieldNumber" : {
+                "type": "string"
+              },
+              "FMFieldName" : {
+                "type": "string"
+             },
+             "FMFieldType" : {
+               "type": "string"
+             }
+            }
+          }
     },
     "swagger": "2.0"
 }

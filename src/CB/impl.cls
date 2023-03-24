@@ -18,9 +18,12 @@ ClassMethod GetSites() As %Stream.Object
         do tObj.%Set("Sta3a",tRSet.%Get("Sta3a"))
         do tArray.%Push(tObj)
     }
-    //Do ..%SetStatusCode(<HTTP_status_code>)
+    Do ..%SetStatusCode("200")
     //Do ..%SetHeader(<name>,<value>)
-    Quit tArray
+    //do ..%SetContentType("application/json")
+    set tObj={}
+    do tObj.%Set("Site",tArray)
+    Quit tObj
 }
 
 /// for a given station number and FileMan file number return information about that file.<br/>
@@ -41,10 +44,24 @@ ClassMethod GetSiteFile(sta3n As %String, filenumber As %String) As %Stream.Obje
 ///     filenumber<br/>
 ClassMethod GetSiteFields(sta3n As %String, filenumber As %String) As %Stream.Object
 {
-    //(Place business logic here)
-    //Do ..%SetStatusCode(<HTTP_status_code>)
+    set tSQL="SELECT ID,VistaFileNumber,VistaFieldNumber,VistaFieldName,VistaFieldType FROM Dim.VistaFieldv001 WHERE Sta3n=? AND VistaFileNumber=?"
+    set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,sta3n,filenumber)
+    set tArray=[]
+    while tRSet.%Next() {
+        set tObj={}
+        do tObj.%Set("id",tRSet.%Get("ID"))
+        do tObj.%Set("FMFileNumber",tRSet.%Get("VistaFileNumber"))
+        do tObj.%Set("FMFieldNumber",tRSet.%Get("VistaFieldNumber"))
+        do tObj.%Set("FMFieldName",tRSet.%Get("VistaFieldName"))
+        do tObj.%Set("FMFieldType",tRSet.%Get("VistaFieldType"))
+        do tArray.%Push(tObj)
+    }
+    Do ..%SetStatusCode("200")
     //Do ..%SetHeader(<name>,<value>)
-    //Quit (Place response here) ; response may be a string, stream or dynamic object
+    //do ..%SetContentType("application/json")
+    set tObj={}
+    do tObj.%Set("Field",tArray)
+    Quit tObj
 }
 
 }

@@ -8,11 +8,11 @@ sudo rm -rf wpb
 sudo rm -rf v08
 sudo rm -rf vx130
 
-mkdir -p bay/code bay/db/rou bay/jrn/jrn bay/jrn/alt
-mkdir -p tam/code tam/db/rou tam/jrn/jrn tam/jrn/alt
-mkdir -p wpb/code wpb/db/rou wpb/jrn/jrn wpb/jrn/alt
-mkdir -p v08/code v08/db/v08/bay/rou v08/db/v08/tam/rou v08/db/v08/wpb/rou v08/jrn/jrn v08/jrn/alt
-mkdir -p vx130/code vx130/db/vx130/vx130code vx130/db/vx130/vx130data vx130/jrn/jrn vx130/jrn/alt
+mkdir -p bay/code bay/db/rou bay/jrn/jrn bay/jrn/alt bay/sys
+mkdir -p tam/code tam/db/rou tam/jrn/jrn tam/jrn/alt tam/sys
+mkdir -p wpb/code wpb/db/rou wpb/jrn/jrn wpb/jrn/alt wpb/sys
+mkdir -p v08/code v08/db/v08/bay/rou v08/db/v08/tam/rou v08/db/v08/wpb/rou v08/jrn/jrn v08/jrn/alt v08/sys
+mkdir -p vx130/code vx130/db/vx130/vx130code vx130/db/vx130/vx130data vx130/jrn/jrn vx130/jrn/alt vx130/sys
 
 docker run -v ./bay/code:/code -v ./bay/sys:/irissys -v ./bay/db:/irisdb -v ./bay/jrn:/irisjrn --name bay -d intersystems/iris:2023.1.0.207.0
 docker run -v ./tam/code:/code -v ./tam/sys:/irissys -v ./tam/db:/irisdb -v ./tam/jrn:/irisjrn --name tam -d intersystems/iris:2023.1.0.207.0
