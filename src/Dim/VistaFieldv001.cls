@@ -95,6 +95,7 @@ ClassMethod BuildSite(pSta3n As %Integer, pStartIEN As %String = 0) As %Status
 /// data about the field from the VISTA data dictionary.
 ClassMethod UpdateObject(pSta3n As %Integer, pFMPK As %String) As %Status
 {
+    NEW tVistaFileNumber, tVistaFieldNumber, tNS 
     Set sc = $$$OK
     Try {
         Set tVistaSite=##class(VX130.VistaSite).%OpenId(pSta3n)
@@ -164,7 +165,7 @@ ClassMethod UpdateObject(pSta3n As %Integer, pFMPK As %String) As %Status
             Set oref.VistaEditDate=$ZDATETIME($ZTIMESTAMP,3)
             Set sc=oref.%Save()
         }
-        Kill oref,tBitFlag,tNS,tVistaFileNumber,tVistaSite
+        Kill oref
     }
     Catch ex {
         Set sc=ex.AsStatus()

@@ -52,7 +52,7 @@ v08 : http://localhost/v08/csp/sys/%25CSP.Portal.Home.zen
 Select the Join as Async for each of the VISTA systems.
 Be sure to make the system a ReadOnly Reporting mirror.
 
-Next you have toactivate and catchup each of the mirrored databases:
+Next you have to activate and catchup each of the mirrored databases:
 
 v08: http://localhost/v08/csp/sys/op/%25CSP.UI.Portal.Mirror.Monitor.zen
 

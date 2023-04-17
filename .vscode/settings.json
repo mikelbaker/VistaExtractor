@@ -1,7 +1,22 @@
 {
     "objectscript.conn": {
         "active": true,
-        "server": "vx130",
+        "server": "v08",
         "ns": "VX130"
-    }
+    },
+    "sqltools.connections": [
+        {
+            "namespace": "vx130",
+            "connectionMethod": "Server and Port",
+            "showSystem": false,
+            "previewLimit": 50,
+            "server": "52.152.220.253",
+            "port": 52773,
+            "https": false,
+            "askForPassword": true,
+            "driver": "InterSystems IRIS",
+            "name": "vx130",
+            "username": "mike"
+        }
+    ]
 }
