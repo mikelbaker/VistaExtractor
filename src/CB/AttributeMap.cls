@@ -78,6 +78,14 @@ ClassMethod FMToIRIS(pFMFieldName As %String, pPointer As %Boolean, ByRef tSC As
     Return tIRISName
 }
 
+/// Description
+Query GetClassMap(pIRISClassName As %String) As %SQLQuery [ SqlProc ]
+{
+    SELECT IRISPropertyName,VistaField->VistaFieldNumber,VistaField->VistaFileNumber, DataDomain, DataType, VistaField->VistaFieldDescription
+    FROM CB.AttributeMap
+    WHERE IRISClassName=:pIRISClassName
+}
+
 Storage Default
 {
 <Data name="AttributeMapDefaultData">

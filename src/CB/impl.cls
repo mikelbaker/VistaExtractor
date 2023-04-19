@@ -1,5 +1,5 @@
 /// Business logic class defined by OpenAPI in CB.spec<br/>
-/// Created Mar 19, 2023 12:43:09
+/// Created Apr 17, 2023 21:15:05
 Class CB.impl Extends %REST.Impl [ ProcedureBlock ]
 {
 
@@ -7,23 +7,12 @@ Class CB.impl Extends %REST.Impl [ ProcedureBlock ]
 Parameter ExposeServerExceptions = 0;
 
 /// Obtain a list of station numbers and station abbreviations.
-ClassMethod GetSites() As %Stream.Object
+ClassMethod GetSites() As %DynamicObject
 {
-    set tSQL="SELECT Sta3n,Sta3a FROM VX130.VistaSite"
-    set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL)
-    set tArray=[]
-    while tRSet.%Next() {
-        set tObj={}
-        do tObj.%Set("Sta3n",tRSet.%Get("Sta3n"))
-        do tObj.%Set("Sta3a",tRSet.%Get("Sta3a"))
-        do tArray.%Push(tObj)
-    }
-    Do ..%SetStatusCode("200")
+    //(Place business logic here)
+    //Do ..%SetStatusCode(<HTTP_status_code>)
     //Do ..%SetHeader(<name>,<value>)
-    //do ..%SetContentType("application/json")
-    set tObj={}
-    do tObj.%Set("Site",tArray)
-    Quit tObj
+    //Quit (Place response here) ; response may be a string, stream or dynamic object
 }
 
 /// for a given station number and FileMan file number return information about that file.<br/>
@@ -40,28 +29,45 @@ ClassMethod GetSiteFile(sta3n As %String, filenumber As %String) As %Stream.Obje
 
 /// For a given station number and FileMan file number return information about the fields in that file.<br/>
 /// The method arguments hold values for:<br/>
-///     sta3n<br/>
+///     sta3n<b"r/>
 ///     filenumber<br/>
 ClassMethod GetSiteFields(sta3n As %String, filenumber As %String) As %Stream.Object
 {
-    set tSQL="SELECT ID,VistaFileNumber,VistaFieldNumber,VistaFieldName,VistaFieldType FROM Dim.VistaFieldv001 WHERE Sta3n=? AND VistaFileNumber=?"
-    set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,sta3n,filenumber)
-    set tArray=[]
-    while tRSet.%Next() {
-        set tObj={}
-        do tObj.%Set("id",tRSet.%Get("ID"))
-        do tObj.%Set("FMFileNumber",tRSet.%Get("VistaFileNumber"))
-        do tObj.%Set("FMFieldNumber",tRSet.%Get("VistaFieldNumber"))
-        do tObj.%Set("FMFieldName",tRSet.%Get("VistaFieldName"))
-        do tObj.%Set("FMFieldType",tRSet.%Get("VistaFieldType"))
-        do tArray.%Push(tObj)
-    }
-    Do ..%SetStatusCode("200")
+    //(Place business logic here)
+    //Do ..%SetStatusCode(<HTTP_status_code>)
     //Do ..%SetHeader(<name>,<value>)
-    //do ..%SetContentType("application/json")
-    set tObj={}
-    do tObj.%Set("Field",tArray)
-    Quit tObj
+    //Quit (Place response here) ; response may be a string, stream or dynamic object
+}
+
+/// For a given IRIS ClassName Get the AttributeMap<br/>
+/// The method arguments hold values for:<br/>
+///     classname<br/>
+ClassMethod GetAMap(classname As %String) As %Stream.Object
+{
+    Try {
+        s ^zmike(classname)=""
+        Set tRSet=##class(%ResultSet).%New("CB.AttributeMap:GetClassMap")
+        set tSC=tRSet.%Execute(classname)
+        Set tAMaps=[]
+        While tRSet.%Next() {
+            Set tAMap={}
+            do tAMap.%Set("IRISPropertyName",tRSet.%Get("IRISPropertyName"))
+            Do tAMap.%Set("VistaFieldNumber",tRSet.%Get("VistaFieldNumber"))
+            Do tAMap.%Set("VistaFileNumber",tRSet.%Get("VistaFileNumber"))
+            Do tAMap.%Set("DataDomain",tRSet.%Get("DataDomain"))
+            Do tAMap.%Set("DataType",tRSet.%Get("DataType"))
+            Do tAMap.%Set("VistaFieldDescription",tRSet.%Get("VistaFieldDescription"))
+            Do tAMaps.%Push(tAMap)
+        }
+        Do ..%SetStatusCode("200")
+        return tAMaps.%ToJSON()
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    //
+    //Do ..%SetHeader(<name>,<value>)
+    //Quit (Place response here) ; response may be a string, stream or dynamic object
 }
 
 }

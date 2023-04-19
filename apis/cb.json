@@ -1,176 +1,249 @@
 {
-    "host" : "localhost",
-    "info": {
-        "title": "",
-        "description": "",
-        "version": "",
-        "x-ISC_Namespace": "VX130"
-    },
-    "basePath": "/vx130/cb",
-    "paths": {
-        "/sites": {
-            "get": {
-                "operationId": "GetSites",
-                "security": [
-                    {
-                        "basicAuth": []
-                    }
+  "host" : "52.152.220.253",
+  "info": {
+      "title": "",
+      "description": "",
+      "version": "",
+      "x-ISC_Namespace": "VX130"
+  },
+  "basePath": "/vx130/cb",
+  "paths": {
+      "/sites": {
+          "get": {
+              "operationId": "GetSites",
+              "security": [
+                  {
+                      "basicAuth": []
+                  }
+              ],
+              "produces": [
+                  "application/json"
                 ],
-                "produces": [
-                    "application/json"
-                  ],
-                "description": " Obtain a list of station numbers and station abbreviations.",
-                "x-ISC_ServiceMethod": "GetSites",
-                "responses": {
-                    "default": {
-                        "description": "(Unexpected Error)"
-                    },
-                    "200": {
-                        "description": "(Expected Result)",
-                        "schema": {
-                            "$ref": "#/definitions/Sites"
-                          }
-                    }
+              "description": " Obtain a list of station numbers and station abbreviations.",
+              "x-ISC_ServiceMethod": "GetSites",
+              "responses": {
+                  "default": {
+                      "description": "(Unexpected Error)"
+                  },
+                  "200": {
+                      "description": "(Expected Result)",
+                      "schema": {
+                          "$ref": "#/definitions/Sites"
+                        }
+                  }
+              }
+          }
+      },
+      "/file/{sta3n}/{filenumber}": {
+          "get": {
+              "parameters": [
+                  {
+                      "name": "sta3n",
+                      "in": "path",
+                      "required": true,
+                      "type": "string"
+                  },
+                  {
+                      "name": "filenumber",
+                      "in": "path",
+                      "required": true,
+                      "type": "string"
+                  }
+              ],
+              "operationId": "GetSiteFile",
+              "description": "for a given station number and FileMan file number return information about that file.",
+              "x-ISC_ServiceMethod": "GetSiteFile",
+              "responses": {
+                  "default": {
+                      "description": "(Unexpected Error)"
+                  },
+                  "200": {
+                      "description": "(Expected Result)"
+                  }
+              }
+          }
+      },
+      "/fields/{sta3n}/{filenumber}": {
+          "get": {
+              "parameters": [
+                  {
+                      "name": "sta3n",
+                      "in": "path",
+                      "required": true,
+                      "type": "string"
+                  },
+                  {
+                      "name": "filenumber",
+                      "in": "path",
+                      "required": true,
+                      "type": "string"
+                  }
+              ],
+              "operationId": "GetSiteFields",
+              "description": "For a given station number and FileMan file number return information about the fields in that file.",
+              "x-ISC_ServiceMethod": "GetSiteFields",
+              "responses": {
+                  "default": {
+                      "description": "(Unexpected Error)"
+                  },
+                  "200": {
+                      "description": "(Expected Result)",
+                      "schema": {
+                          "$ref": "#/definitions/Fields"
+                        }
+                  }
+              }
+          }
+      },
+      "/amap/{classname}": {
+        "get": {
+            "parameters": [
+                {
+                    "name": "classname",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
                 }
-            }
-        },
-        "/file/{sta3n}/{filenumber}": {
-            "get": {
-                "parameters": [
-                    {
-                        "name": "sta3n",
-                        "in": "path",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "filenumber",
-                        "in": "path",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "operationId": "GetSiteFile",
-                "description": "for a given station number and FileMan file number return information about that file.",
-                "x-ISC_ServiceMethod": "GetSiteFile",
-                "responses": {
-                    "default": {
-                        "description": "(Unexpected Error)"
-                    },
-                    "200": {
-                        "description": "(Expected Result)"
-                    }
-                }
-            }
-        },
-        "/fields/{sta3n}/{filenumber}": {
-            "get": {
-                "parameters": [
-                    {
-                        "name": "sta3n",
-                        "in": "path",
-                        "required": true,
-                        "type": "string"
-                    },
-                    {
-                        "name": "filenumber",
-                        "in": "path",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "operationId": "GetSiteFields",
-                "description": "For a given station number and FileMan file number return information about the fields in that file.",
-                "x-ISC_ServiceMethod": "GetSiteFields",
-                "responses": {
-                    "default": {
-                        "description": "(Unexpected Error)"
-                    },
-                    "200": {
-                        "description": "(Expected Result)",
-                        "schema": {
-                            "$ref": "#/definitions/Fields"
-                          }
-                    }
+            ],
+            "operationId": "GetAMap",
+            "description": "For a given IRIS ClassName Get the AttributeMap",
+            "x-ISC_ServiceMethod": "GetAMap",
+            "responses": {
+                "default": {
+                    "description": "(Unexpected Error)"
+                },
+                "200": {
+                    "description": "(Expected Result)",
+                    "schema": {
+                        "$ref": "#/definitions/AttributeMaps"
+                      }
                 }
             }
         }
-    },
-    "securityDefinitions": {
-        "basicAuth": {
-            "type": "basic"
+    }
+  },
+  "securityDefinitions": {
+      "basicAuth": {
+          "type": "basic"
+      }
+  },
+  "definitions": {
+      "Sites": {
+        "type": "object",
+        
+        "properties": {
+          "Site": {
+            "type": "array",
+              "xml": {
+                "wrapped": true
+                  },
+                "items": {
+                  "xml": {
+                   "name": "Site"
+                  },
+                  "$ref": "#/definitions/Site"
+                }
+          }
         }
-    },
-    "definitions": {
-        "Sites": {
+
+      },
+      "Site": {
+        "type": "object",
+        "properties": {
+          "Sta3n" : {
+            "type": "string"
+          },
+          "Sta3a" : {
+             "type": "string"
+          }
+        }
+      },
+
+      "Fields": {
           "type": "object",
           
           "properties": {
-            "Site": {
+            "Field": {
               "type": "array",
                 "xml": {
                   "wrapped": true
                     },
                   "items": {
                     "xml": {
-                     "name": "Site"
+                     "name": "Field"
                     },
-                    "$ref": "#/definitions/Site"
+                    "$ref": "#/definitions/Field"
                   }
             }
           }
- 
         },
-        "Site": {
+        "Field": {
           "type": "object",
           "properties": {
-            "Sta3n" : {
+            "id" : {
               "type": "string"
             },
-            "Sta3a" : {
+            "FMFileNumber" : {
                "type": "string"
-            }
+            },
+            "FMFieldNumber" : {
+              "type": "string"
+            },
+            "FMFieldName" : {
+              "type": "string"
+           },
+           "FMFieldType" : {
+             "type": "string"
+           }
           }
         },
-
-        "Fields": {
-            "type": "object",
-            
-            "properties": {
-              "Field": {
-                "type": "array",
-                  "xml": {
-                    "wrapped": true
-                      },
-                    "items": {
-                      "xml": {
-                       "name": "Field"
-                      },
-                      "$ref": "#/definitions/Field"
-                    }
-              }
-            }
-          },
-          "Field": {
-            "type": "object",
-            "properties": {
-              "id" : {
-                "type": "string"
-              },
-              "FMFileNumber" : {
-                 "type": "string"
-              },
-              "FMFieldNumber" : {
-                "type": "string"
-              },
-              "FMFieldName" : {
-                "type": "string"
-             },
-             "FMFieldType" : {
+        "AttributeMap": {
+          "type": "object",
+          "properties": {
+            "id" : {
+              "type": "integer"
+            },
+            "IRISPropertyName" : {
                "type": "string"
-             }
+            },
+            "IRISClassName" : {
+              "type": "string"
+            },
+            "VistaFieldNumber" : {
+              "type": "string"
+           },
+           "VistaFileNumber" : {
+             "type": "string"
+           },
+           "DataType" : {
+            "type" : "string"
+           },
+           "DataDomain" : {
+            "type": "string"
+           },
+           "VistaFieldDescription" : {
+            "type": "string"
+           }
+          }
+        },
+        "AttributeMaps": {
+          "type": "object",
+          
+          "properties": {
+            "AttributeMap": {
+              "type": "array",
+                "xml": {
+                  "wrapped": true
+                    },
+                  "items": {
+                    "xml": {
+                     "name": "AttributeMap"
+                    },
+                    "$ref": "#/definitions/AttributeMap"
+                  }
             }
           }
-    },
-    "swagger": "2.0"
+        }
+  },
+  "swagger": "2.0"
 }

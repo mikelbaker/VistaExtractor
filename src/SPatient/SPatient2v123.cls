@@ -18,7 +18,7 @@
 /// Those fields are scheduled to be removed from the file due to either
 /// lack of use or replacement by another field/file in the next release.
 /// 
-Class SPatient.SPatient2v123 Extends %Persistent [ ClassType = persistent, Not ProcedureBlock, SqlRowIdPrivate, SqlTableName = SPatient_2_v123 ]
+Class SPatient.SPatient2v123 Extends (%Persistent, %JSON.Adaptor) [ ClassType = persistent, Not ProcedureBlock, SqlRowIdPrivate, SqlTableName = SPatient_2_v123 ]
 {
 
 /// File Number: 2 Field Number :.32102

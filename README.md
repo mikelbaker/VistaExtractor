@@ -67,4 +67,6 @@ Create the ClassBuilder APIS
     b. set the url to http://localhost/vx130/api/mgmnt/v2/VX130/CB
     c. Set the TYPE to POST
     d. Set the Authentication to basic and add your username and password.
-    
+
+
+Swagger - Azure
