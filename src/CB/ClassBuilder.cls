@@ -30,6 +30,13 @@ ClassMethod BuildClass(pIRISClassName As %String) As %Status
 
         set tSC=..AddIndex(tClassDef)
         quit:'tSC
+
+        set tSC= ..AddBuildSite(tClassDef)
+        quit:'tSC
+
+        set tSC=..AddUpdateObject(tClassDef)
+        quit:'tSC
+
     }
     Catch ex {
         Set tSC=ex.AsStatus()
@@ -261,23 +268,209 @@ ClassMethod AddBuildSite(pClassDef As %Dictionary.ClassDefinition) As %Status
 {
     Set tSC = $$$OK
     Try {
-        set tClassName=pClassDef.Name
-        set tSQL="SELECT %NOLOCK IRISPropertyName,VistaFile FROM CB.AttributeMap WHERE IRISClassName=? AND VistaFile IS NOT NULL ORDER BY VistaFile"
-        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,tClassName)
-        while tRSet.%Next() {
-            set tPropertyName=tRSet.%Get("IRISPropertyName")
-            set tVistaFile=tRSet.%Get("VistaFile")
-            &sql(SELECT GlobalNode INTO :tGlobalNode FROM Dim.VistaFieldv001 WHERE VistaFile=:tVistaFile AND VistaFieldNumber='.01')
-            if $GET(tGlobalNode)']"" {
-                quit
-            }
-            
-        }
+        set tCodeStream=##class(%Stream.TmpCharacter).%New()
+        do tCodeStream.Write(..BuildSiteCode(pClassDef.Name))
+        set tMethod=##class(%Dictionary.MethodDefinition).%New()
+        set tMethod.Name="BuildSite"
+        set tMethod.parent=pClassDef
+        set tMethod.ClassMethod=1
+        set tMethod.Implementation=tCodeStream
+        set tMethod.FormalSpec="pSta3n:%Integer,pStartIEN:%String=0"
+        set tMethod.ReturnType="%Status"
+        set tSC = tMethod.%Save()
+        quit:'tSC
+        set tSC = pClassDef.Methods.Insert(tMethod)
+        quit:'tSC
+        set tSC = pClassDef.%Save()
+        quit:'tSC
     }
     Catch ex {
         Set tSC=ex.AsStatus()
     }
     Return tSC
+}
+
+/// Description
+ClassMethod BuildSiteCode(pIRISClassName As %String, ByRef tSC As %Status) As %String
+{
+    Set tSC = $$$OK
+    Try {
+        set tCode=$C(9)_"set tSC = $$$OK"_$C(13,10,9)_
+            "Try {"_$C(13,10,9,9)_
+                "set tVistaSite = ##class(VX130.VistaSite).%OpenId(pSta3n)"_$C(13,10,9,9)_
+                "set tNS = tVistaSite.Sta3a"_$C(13,10,9,9)_"kill tVistaSite"_$C(13,10,9,9)_
+                "set tLastIEN = """""_$C(13,10)
+        set tCodeEnd=""
+        set tTab=$C(9,9)
+        set tD=0
+        set tPropertyNames=""
+        set tSQL="SELECT %NOLOCK IRISPropertyName,VistaFile FROM CB.AttributeMap WHERE IRISClassName=? AND VistaFile IS NOT NULL ORDER BY VistaFile"
+        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,pIRISClassName)
+        while tRSet.%Next() {
+            
+            set tPropertyName(tD)="t"_tRSet.%Get("IRISPropertyName")
+            if tD=0 {
+                set tLastIEN="set tLastIEN = "_tPropertyName(tD)
+            } else {
+                set tLastIEN=tLastIEN_"_"",""_"_tPropertyName(tD)
+            }
+            set tVistaFile=tRSet.%Get("VistaFile")
+            &sql(SELECT GlobalNode INTO :tGlobalNode FROM Dim.VistaFieldv001 WHERE VistaFile=:tVistaFile AND VistaFieldNumber='.01')
+            if $GET(tGlobalNode)']"" {
+                set tSC=$SYSTEM.Status.Error(5001, "Missing Global Node in DataDictionary for "_tVisaFile_" .01 field")
+                quit
+            }
+            set tGlobal=$PIECE($PIECE(tGlobalNode,"^",2),"D"_tD,1)_"D"_tD
+            if tD=0 {
+                set tCode=tCode_tTab_"set "_tPropertyName(tD)_" = $ORDER(^|tNS|"_$REPLACE(tGlobal,"D0","pStartIEN")_"))"_$C(13,10)
+            } else {
+                set tCode=tCode_tTab_"set "_tPropertyName(tD)_" = $ORDER(^|tNS|"_tGlobal_"))"_$C(13,10)
+            }
+            
+            set tCode=tCode_tTab_"while +"_tPropertyName(tD)_" {"_$C(13,10)
+            set tCodeEnd=tTab_$C(9)_"set "_tPropertyName(tD)_" = $ORDER(^|tNS|"_tGlobal_"))"_$C(13,10)_
+                tTab_"}"_$C(13,10)
+            set tD=tD+1
+            set tTab=tTab_$C(9)
+        }
+        set tCode=tCode_tTab_tLastIEN_$C(13,10)_tTab_"set tSC=..UpdateObject(pSta3n,tLastIEN,1)"_$C(13,10)
+        set tCode=tCode_tCodeEnd_$C(9)_"}"_$C(13,10,9)_"Catch ex {"_$C(13,10,9,9)_
+            "Set tSC=ex.AsStatus()"_$C(13,10,9)_"}"_$C(13,10,9)_
+            "return tSC"_$C(13,10)
+        for tI=0:1:(tD-1) {
+            set tCode=$REPLACE(tCode,"D"_tI,tPropertyName(tI))
+        }
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tCode
+}
+
+ClassMethod AddUpdateObject(pClassDef As %Dictionary.ClassDefinition) As %Status
+{
+    Set tSC = $$$OK
+    Try {
+        set tCodeStream=##class(%Stream.TmpCharacter).%New()
+        do tCodeStream.Write(..UpdateObjectCode(pClassDef.Name))
+        set tMethod=##class(%Dictionary.MethodDefinition).%New()
+        set tMethod.Name="UpdateObject"
+        set tMethod.parent=pClassDef
+        set tMethod.ClassMethod=1
+        set tMethod.Implementation=tCodeStream
+        set tMethod.FormalSpec="pSta3n:%Integer,pFMPK:%String,pHistoricalPull:%Boolean=0,pLogEdits:%Boolean=0"
+        set tMethod.ReturnType="%Status"
+        set tSC = tMethod.%Save()
+        quit:'tSC
+        set tSC = pClassDef.Methods.Insert(tMethod)
+        quit:'tSC
+        set tSC = pClassDef.%Save()
+        quit:'tSC
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tSC
+}
+
+/// Description
+ClassMethod UpdateObjectCode(pIRISClassName As %String, ByRef tSC As %Status) As %String
+{
+    Set tSC = $$$OK
+    set tCode=$C(9)_
+        "set tSC=$$$OK"_$C(13,10,9)_
+        "Try {"_$C(13,10,9,9)_
+            "set tVistaSite=##class(VX130.VistaSite).%OpenId(pSta3n)"_$C(13,10,9,9)_
+	        "set tNS=tVistaSite.Sta3a"_$C(13,10,9,9)_
+            "kill tVistaSite"_$C(13,10,9,9)_
+	        "kill tBitFlag"_$C(13,10,13,10,9,9) 
+    set tD=0  
+    Try {
+        set tId=$C(9,9)_"set tId = pSta3n"
+        set tSQL="SELECT %NOLOCK IRISPropertyName,VistaFile FROM CB.AttributeMap WHERE IRISClassName=? AND VistaFile IS NOT NULL ORDER BY VistaFile"
+        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,pIRISClassName)
+        while tRSet.%Next() {
+            set tVistaFile=tRSet.%Get("VistaFile")
+            &sql(SELECT GlobalNode INTO :tGlobalNode FROM Dim.VistaFieldv001 WHERE VistaFile=:tVistaFile AND VistaFieldNumber='.01')
+            set tPropertyName(tD)="t"_tRSet.%Get("IRISPropertyName")
+            set tId=tId_"_""||""_"_tPropertyName(tD)
+            if tD=0 {
+                set tMethodSig="t"_tRSet.%Get("IRISPropertyName")
+            } else {
+                set tMethodSig=tMethodSig_",t"_tRSet.%Get("IRISPropertyName")
+            }
+
+            set tCode=tCode_"set "_tPropertyName(tD)_" = $PIECE(pFMPK,""^"","_(tD+1)_")"_$c(13,10,9,9)_
+                "quit:(+"_tPropertyName(tD)_"'>0)"_$C(13,10,13,10,9,9)_
+                "if ($GET(^|tNS|"_$PIECE(tGlobalNode,"^",2)_")="""") {"_$C(13,10,9,9,9)_
+                    "set tSC = ..RemoveObject(pSta3n,pFMPK)"_$C(13,10,9,9,9)_
+                    "quit"_$C(13,10,9,9)_"}"_$C(13,10)
+            set tD=tD+1
+        }
+        kill tRSet,tSQL
+        set tCode=tCode_tId_$C(13,10,9,9)_
+            "set tObj = ..%OpenId(tId,4,.tSC)"_$C(13,10,13,10,9,9)_
+            "if '$$$ISOK(tSC) {"_$C(13,10,9,9,9)_
+                "if $System.Status.GetErrorCodes(tSC)'=5809 {"_$C(13,10,9,9,9,9)_
+			    "// Error is not because the object does not exist.  Probably can't get lock."_$C(13,10,9,9,9,9)_
+                "quit"_$C(13,10,9,9,9)_
+                "}"_$C(13,10,9,9)_
+            "} // Either got lock or object does not exist yet."_$C(13,10,13,10,9,9)_
+            "if '$ISOBJECT(tObj) {"_$C(13,10,9,9,9)_
+                "set tObj=..%New()"_$C(13,10,9,9,9)_
+                "set tObj.Sta3n=pSta3n"_$C(13,10,9,9,9)
+        
+        for tI=0:1:(tD-1) {
+            set tCode=tCode_
+                "set tObj."_$EXTRACT(tPropertyName(tI),2,$LENGTH(tPropertyName(tI)))_" = "_tPropertyName(tI)_$C(13,10,9,9,9)
+        }
+		set tCode=tCode_
+            "set tObj.VistaCreateDate=$Case(pHistoricalPull,1:""1900-01-01"",:$ZDATETIME($ZTIMESTAMP,3))"_$C(13,10,9,9,9)_
+		    "set tObj.OpCode="""""_$C(13,10,9,9,9)_
+            "set $BIT(tBitFlag,1)=1"_$C(13,10,9,9)_
+            "}"_$C(13,10,13,10,9,9)
+        
+        set tSQL="SELECT IRISPropertyName FROM CB.AttributeMap WHERE IRISClassName=? AND VistaField IS NOT NULL"
+        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,pIRISClassName)
+        set tI=2
+        while tRSet.%Next() {
+            set tCode=tCode_"set $BIT(tBitFlag,"_tI_")=tObj.set"_tRSet.%Get("IRISPropertyName")_"(tNS,"_tMethodSig_")"_$C(13,10,9,9)
+            set tI=tI+1
+        }
+       
+        set tCode=tCode_$C(13,10,9,9)_
+            "if tObj.OpCode]"""" {"_$C(13,10,9,9,9)_
+                "set tObj.OpCode="""""_$C(13,10,9,9,9)_
+                "Set $BIT(tBitFlag,"_tI_")=1"_$C(13,10,9,9)_
+            "}"_$C(13,10,9,9)_
+            "if $BITFIND(tBitFlag,1)>0 {"_$C(13,10,9,9,9)_
+                "// Something changed."_$C(13,10,9,9,9)_
+                "if pLogEdits {"_$C(13,10,9,9,9,9)_
+                    "write ..%ClassName(1),tId,"" """_$C(13,10,9,9,9,9)_
+                    "for tzz=1:1:"_tI_" {"_$C(13,10,9,9,9,9,9)_
+                        "write $BIT(tBitFlag,tzz)"_$C(13,10,9,9,9,9)_
+                    "}"_$C(13,10,9,9,9,9)_
+                    "write !"_$C(13,10,9,9,9,9)_
+                    "///read tzzz"_$C(13,10,9,9,9)_
+                    "}"_$C(13,10,9,9,9)_
+                "set tObj.VistaEditDate=$ZDATETIME($ZTIMESTAMP,3)"_$C(13,10,9,9,9)_
+                "set tSC=tObj.%Save()"_$C(13,10,9,9)_
+            "}"_$C(13,10,9,9)_
+            "quit"_$C(13,10,9)_
+            "}"_$C(13,10,9)_
+            "Catch ex {"_$C(13,10,9,9)_
+                "set tSC=ex.AsStatus()"_$C(13,10,9)_
+            "}"_$C(13,10,9)_
+            "kill tObj"_$C(13,10,9)_
+            "return tSC"_$C(13,10)
+        for tI=0:1:(tD-1) {
+            set tCode=$REPLACE(tCode,"D"_tI,tPropertyName(tI))
+        }
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tCode
 }
 
 }
