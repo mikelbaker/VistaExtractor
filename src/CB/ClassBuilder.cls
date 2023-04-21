@@ -1,7 +1,58 @@
 Class CB.ClassBuilder Extends %RegisteredObject
 {
 
-/// Description
+/// Using the given IRIS ClassName find the records in the CB.AttributeMap
+/// and create a VX130 class that will maintain the VX130 records when the
+/// VISTA records are updated.  This class will have the following characteristics:
+/// 1. The record will have a MainIndex that will be the primarykey and id, that
+///     index will contain the 3 digit station number, (Sta3n), and all of the
+///     FileMan Internal Entry Numbers, (IENs), that make that record unique on
+///     the VISTA system.
+/// 2. The record will have a property and an index on the VistaEditDate.  
+///     The VistaEditDate will be updated with the current UTC date anytime the
+///     VISTA record is changed. This allows the user to quickly find all of the 
+///     records that have changed during some timeframe so that it will be easy
+///     to extract any new records but also any records that where modified during
+///     that timeframe.
+/// 3. The record will have a property named VistaCreateDate.  This date will only
+///     be set the first time the record is discovered on the VISTA system.  If an 
+///     historical pull of the data is run on existing records, those records will
+///     have a VistaCreateDate of '1900-01-01'.  If the record is discovered by
+///     the normal process that watches for changes in the VISTA system then the
+///     VistaEditDate will be set to the current UTC date.
+/// 4. UTC dates are used for the VistaCreateDate and VistaEditDate so that the user
+///     does not need to worry about what timezone the VISTA system is in when determining
+///     which records were updated during some timeframe.
+/// 5. All classes will have a property named OpCode.  This property will be null
+///     unless the record is deleted on the VISTA system.  If the record is deleted the
+///     OpCode will be set to 'D' on the VX130 record and the VistaEditDate will be set
+///     to the current UTC date and time.
+///     That will allow the user to find any records they may have already transferred,
+///     and to remove them from thier database or otherwise hide it from users.
+/// 6. All classes will have a class method named UpdateObject.  The UpdateObject method
+///     takes a Sta3n and the unique IENs from the VISTA system and checks all of the
+///     class properties for changes.  If changes are detected, the properties will be
+///     updated and the VistaEditDate will be updated.  If the record did not exist then
+///     the VistaCreateDate will also be updated.
+/// 7. All classes will have a class method named RemoveObject.  The RemoveObject method
+///     takes a Sta3n and the unique IENs from the VISTA system and checks to see if the
+///     record exists in the VX130 database and the VISTA database.  If the record was
+///     deleted from the VISTA database and it exists oin the VX130 database the OpCode
+///     will be set equal to 'D' and the VistaEditDate will be updated.
+/// 8. All classes have a class method named BuildSite.  The BuildSite method takes a
+///     Sta3n and loops through all of the VISTA records at that site and will add the
+///     record to the VX130 database if it does not exist.  Any record that is added using
+///     the BuildSite method will set the VistaCreateDate to '1900-01-01' but the
+///     VistaEditDate will be set the the current UTC date time.
+/// 9. All classes will have properties that are specific to the fields that were mapped
+///     in the CB.AttributeMap.  A set method is created for each property and that code
+///     will find the correspoding data for that VISTA field and compare it to the value
+///     stored in the VX130. If the values are the same the return value will be false,
+///     (no changes), if the VISTA value is different the property will be updated and the 
+///     return value will be set to true.  That in turn will trigger a %Save() on the
+///     object and update the VistaEditDate and if necessary update the VistaCreateDate.
+///      
+/// 
 ClassMethod BuildClass(pIRISClassName As %String) As %Status
 {
     Set tSC = $$$OK
@@ -37,8 +88,13 @@ ClassMethod BuildClass(pIRISClassName As %String) As %Status
         set tSC=..AddUpdateObject(tClassDef)
         quit:'tSC
 
+        set tSC=..AddRemoveObject(tClassDef)
+        quit:'tSC
+
         set tSC=..AddSetMethods(tClassDef)
         quit:'tSC
+
+
 
     }
     Catch ex {
@@ -47,7 +103,10 @@ ClassMethod BuildClass(pIRISClassName As %String) As %Status
     Return tSC
 }
 
-/// Description
+/// This method uses the CB.AttributeMap data to add properties to the class
+/// with the correct type and constraints. For each record returned from
+/// the CB.AttributeMap it will call the AddProperty method to add a property
+/// to the class being built. 
 ClassMethod AddProperties(pClassDef As %Dictionary.ClassDefinition) As %Status
 {
     #Dim tFMField As Dim.VistaFieldv001
@@ -70,7 +129,7 @@ ClassMethod AddProperties(pClassDef As %Dictionary.ClassDefinition) As %Status
     Return tSC
 }
 
-/// Description
+/// This method creates the class inherting from %Persistent and %JSON,Adaptor.
 ClassMethod CreateClass(pIRISClassName As %String, ByRef tClassDef As %Dictionary.ClassDefinition) As %Status
 {
     Set tSC = $$$OK
@@ -88,7 +147,9 @@ ClassMethod CreateClass(pIRISClassName As %String, ByRef tClassDef As %Dictionar
     Return tSC
 }
 
-/// Description
+/// This method takes an IRIS class name and checks the IRIS data dictionary for 
+/// a class definition.  If found it will delete the class and defintion from the
+/// VX130 system.
 ClassMethod DeleteClass(pIRISClassName As %String) As %Status
 {
     Set tSC = $$$OK
@@ -101,7 +162,9 @@ ClassMethod DeleteClass(pIRISClassName As %String) As %Status
     Return tSC
 }
 
-/// Description
+/// Given a CB.AttributeMap record and a class definition object, this method
+/// will add the property with the type defined in the AttrbuteMap along with
+/// any constraints that need to be placed on that property type.
 ClassMethod AddProperty(pAttributeMap As CB.AttributeMap, pClassDef As %Dictionary.ClassDefinition) As %Status
 {
     Set tSC = $$$OK
@@ -143,7 +206,8 @@ ClassMethod AddProperty(pAttributeMap As CB.AttributeMap, pClassDef As %Dictiona
     Return tSC
 }
 
-/// Description
+/// This method will add the common properties all VX130 classes share, namely:
+/// Sta3n,OpCode,VistaEditDate,VistaCreateDate.
 ClassMethod AddCommonPropeties(pClassDef As %Dictionary.ClassDefinition) As %Status
 {
     Set tSC = $$$OK
@@ -185,7 +249,8 @@ ClassMethod AddCommonPropeties(pClassDef As %Dictionary.ClassDefinition) As %Sta
     Return tSC
 }
 
-/// Description
+/// This method will add the VISTA File Description to the class that is
+/// watching the data from that VISTA file.
 ClassMethod AddClassDescription(pClassDef As %Dictionary.ClassDefinition) As %Status
 {
     Set sc = $$$OK
@@ -208,7 +273,9 @@ ClassMethod AddClassDescription(pClassDef As %Dictionary.ClassDefinition) As %St
     Return sc
 }
 
-/// Description
+/// When a numeric property is being defined this method will be
+/// called to setup min and max values as defined by the 
+/// CB.AttributeMap for that property. 
 ClassMethod CalculateMinMax(pNumericScale As %String, ByRef tSC As %Status) As %String
 {
     Set tSC = $$$OK
@@ -224,7 +291,10 @@ ClassMethod CalculateMinMax(pNumericScale As %String, ByRef tSC As %Status) As %
     Return tWhole_tDecimal
 }
 
-/// Description
+/// This method adds the MainIndex for the unique Sta3n and IENs so that the record
+/// is quickly and easily found when a change is made on VISTA.  It also adds the
+/// VistaEditDateIndex so that recently changed records are quickly and easily
+/// determined.
 ClassMethod AddIndex(pClassDef As %Dictionary.ClassDefinition) As %Status
 {
     #Dim tIndex As %Dictionary.IndexDefinition
@@ -266,7 +336,9 @@ ClassMethod AddIndex(pClassDef As %Dictionary.ClassDefinition) As %Status
     Return tSC
 }
 
-/// Description
+/// This method calls the BuildSiteCode method to generate the code
+/// used to loop through the VISTA file for a site and then add that
+/// code and method to the given class definition object.
 ClassMethod AddBuildSite(pClassDef As %Dictionary.ClassDefinition) As %Status
 {
     Set tSC = $$$OK
@@ -293,7 +365,10 @@ ClassMethod AddBuildSite(pClassDef As %Dictionary.ClassDefinition) As %Status
     Return tSC
 }
 
-/// Description
+/// This method uses the information in the CB.AttributeMap to determine which
+/// VISTA file and global contains the data for the class and then builds the
+/// code that will loop through that data so that an historical pull can be
+/// performed on the class.
 ClassMethod BuildSiteCode(pIRISClassName As %String, ByRef tSC As %Status) As %String
 {
     Set tSC = $$$OK
@@ -350,6 +425,11 @@ ClassMethod BuildSiteCode(pIRISClassName As %String, ByRef tSC As %Status) As %S
     Return tCode
 }
 
+/// This method calls the UpdateObjectCode method to generate the code
+/// used to locate a record in the VISTA file for a site and also locate
+/// locate and update the corresponding VX130 record.  The method returns
+/// a status object with the result of the update.  
+/// 
 ClassMethod AddUpdateObject(pClassDef As %Dictionary.ClassDefinition) As %Status
 {
     Set tSC = $$$OK
@@ -376,7 +456,12 @@ ClassMethod AddUpdateObject(pClassDef As %Dictionary.ClassDefinition) As %Status
     Return tSC
 }
 
-/// Description
+/// This method generates the code for the UpdateObject method based
+/// on data in the CB.AttributeMap for the given IRIS classname.  It 
+/// writes code to find the record in the VISTA system and also find
+/// the record on the VX130 system.  The code checks all of the properties
+/// for changes and if any are discovered updates the VX130 record and
+/// sets a new VistaEditDate and VistaCreateDate if needed.
 ClassMethod UpdateObjectCode(pIRISClassName As %String, ByRef tSC As %Status) As %String
 {
     Set tSC = $$$OK
@@ -476,7 +561,10 @@ ClassMethod UpdateObjectCode(pIRISClassName As %String, ByRef tSC As %Status) As
     Return tCode
 }
 
-/// Description
+/// This method queries the CB.AttributeMap for the class and for each
+/// mapped property calls the AddSetMethod property to add an instance
+/// method that has code that can compare the VISTA field value to the
+/// VX130 property value. 
 ClassMethod AddSetMethods(pClassDef As %Dictionary.ClassDefinition) As %Status
 {
     Set tSC = $$$OK
@@ -506,6 +594,11 @@ ClassMethod AddSetMethods(pClassDef As %Dictionary.ClassDefinition) As %Status
     Return tSC
 }
 
+/// This method uses the given class definition object, a CB.AttributeMap
+/// object, and a list of IENs to make a call to SetMethodCode and create
+/// an instance method that will compare a VISTA field to the corresponding
+/// VX130 class property and return a boolean value that indicates if a change
+/// was made to the property, (true) or if no change was made, (false).
 ClassMethod AddSetMethod(pClassDef As %Dictionary.ClassDefinition, pAMapID As %Integer, pIENList As %ArrayOfDataTypes) As %Status
 {
     Set tSC = $$$OK
@@ -545,7 +638,9 @@ ClassMethod AddSetMethod(pClassDef As %Dictionary.ClassDefinition, pAMapID As %I
     Return tSC
 }
 
-/// Description
+/// This method creates the code for the instance property to
+/// determine if the property is the same as the VISTA field
+/// or if the property needs to be updated.
 ClassMethod SetMethodCode(pAttributeID As %Integer, ByRef tSC As %Status) As %String
 {
     Set tSC = $$$OK
@@ -575,7 +670,7 @@ ClassMethod SetMethodCode(pAttributeID As %Integer, ByRef tSC As %Status) As %St
         } elseif (tAMap.DataType="%FilemanTimeStamp") {
             set tCode = tCode_
                 "if ('##class(%FilemanTimeStamp).IsValid(t"_tPropertyName_")) {"_$C(13.10,9,9)_
-                    "set t"_tPropertyName_" = ""1410000"""_$C(13,10,9,9)_
+                    "set t"_tPropertyName_" = ""1401231"""_$C(13,10,9,9)_
                     "kill %objlasterror"_$C(13,10,9)_
                 "}"_$C(13,10,9)
         }
@@ -592,6 +687,129 @@ ClassMethod SetMethodCode(pAttributeID As %Integer, ByRef tSC As %Status) As %St
     }
     kill tAMap,tField,tPropertyName,tGlobal,tPiece
     Return $GET(tCode)
+}
+
+/// This method uses the given class defintion to call the RemoveObJectCode
+/// method to write the code that determines if a VX130 object/record needs
+/// to have the OpCode property set, and add that method to the class definition.
+ClassMethod AddRemoveObject(pClassDef As %Dictionary.ClassDefinition) As %Status
+{
+    Set tSC = $$$OK
+    Try {
+        set tCodeStream=##class(%Stream.TmpCharacter).%New()
+        do tCodeStream.Write(..RemoveObjectCode(pClassDef.Name))
+        set tMethod=##class(%Dictionary.MethodDefinition).%New()
+        set tMethod.Name="RemoveObject"
+        set tMethod.parent=pClassDef
+        set tMethod.ClassMethod=1
+        set tMethod.Implementation=tCodeStream
+        set tMethod.FormalSpec="pSta3n:%Integer,pFMPK:%String"
+        set tMethod.ReturnType="%Status"
+        set tSC = tMethod.%Save()
+        quit:'tSC
+        set tSC = pClassDef.Methods.Insert(tMethod)
+        quit:'tSC
+        set tSC = pClassDef.%Save()
+        quit:'tSC
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tSC
+}
+
+/// This method uses the given IRIS classname to write the code that 
+/// will check the VISTA system to see if the record is deleted. If the
+/// record is not found on the VISTA system but is found in the VX130 the
+/// method will set the OpCode property of the record and update the VistaEditDate.
+ClassMethod RemoveObjectCode(pIRISClassName As %String, ByRef tSC As %Status) As %String
+{
+    Set tSC = $$$OK
+    set tCode=$C(9)_
+        "set tSC=$$$OK"_$C(13,10,9)_
+        "Try {"_$C(13,10,9,9)_
+            "set tVistaSite=##class(VX130.VistaSite).%OpenId(pSta3n)"_$C(13,10,9,9)_
+	        "set tNS=tVistaSite.Sta3a"_$C(13,10,9,9)_
+            "kill tVistaSite"_$C(13,10,13,10,9,9)
+    set tD=0  
+    Try {
+        set tId=$C(9,9)_"set tId = pSta3n"
+        set tSQL="SELECT %NOLOCK IRISPropertyName,VistaFile FROM CB.AttributeMap WHERE IRISClassName=? AND VistaFile IS NOT NULL ORDER BY VistaFile"
+        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,pIRISClassName)
+        while tRSet.%Next() {
+            set tVistaFile=tRSet.%Get("VistaFile")
+            &sql(SELECT GlobalNode INTO :tGlobalNode FROM Dim.VistaFieldv001 WHERE VistaFile=:tVistaFile AND VistaFieldNumber='.01')
+            set tPropertyName(tD)="t"_tRSet.%Get("IRISPropertyName")
+            set tId=tId_"_""||""_"_tPropertyName(tD)
+
+            set tCode=tCode_"set "_tPropertyName(tD)_" = $PIECE(pFMPK,""^"","_(tD+1)_")"_$c(13,10,9,9)_
+                "quit:(+"_tPropertyName(tD)_"'>0)"_$C(13,10,13,10,9,9)_
+                "if ($GET(^|tNS|"_$PIECE(tGlobalNode,"^",2)_")='"""") {"_$C(13,10,9,9,9)_
+                    "set tSC = ..UpdateObject(pSta3n,pFMPK)"_$C(13,10,9,9,9)_
+                    "quit"_$C(13,10,9,9)_"}"_$C(13,10)
+            set tD=tD+1
+        }
+        kill tRSet,tSQL
+        set tCode=tCode_tId_$C(13,10,9,9)_
+            "set tObj = ..%OpenId(tId,4,.tSC)"_$C(13,10,13,10,9,9)_
+            "if '$$$ISOK(tSC) {"_$C(13,10,9,9,9)_
+                "if $System.Status.GetErrorCodes(tSC)'=5809 {"_$C(13,10,9,9,9,9)_
+			        "// Error is not because the object does not exist.  Probably can't get lock."_$C(13,10,9,9,9,9)_
+                    "quit"_$C(13,10,9,9,9)_
+                "} else {"_$C(13,10,9,9,9,9)_
+                    "//Error is because the object does not exist so we don't have to delete it."_$C(13,10,9,9,9,9)_
+                    "quit"_$C(13,10,9,9,9)_
+                "}"_$C(13,10,9,9)_
+            "} // Either got lock or object does not exist yet."_$C(13,10,13,10,9,9)_
+            "if $ISOBJECT(tObj) {"_$C(13,10,9,9,9)_
+                "set tObj.OpCode=""D"""_$C(13,10,9,9,9)_
+                "set tObj.VistaEditDate=$ZDATETIME($ZTIMESTAMP,3)"_$C(13,10,9,9,9)_
+                "set tSC=tObj.%Save()"_$C(13,10,9,9)_
+            "}"_$C(13,10,9)_
+            "quit"_$C(13,10,9)_
+            "}"_$C(13,10,9)_
+            "Catch ex {"_$C(13,10,9,9)_
+                "set tSC=ex.AsStatus()"_$C(13,10,9)_
+            "}"_$C(13,10,9)_
+            "kill tObj"_$C(13,10,9)_
+            "return tSC"_$C(13,10)
+        for tI=0:1:(tD-1) {
+            set tCode=$REPLACE(tCode,"D"_tI,tPropertyName(tI))
+        }
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tCode
+}
+
+/// Description
+ClassMethod GlobalsToWatch(pIRISClassName As %String, ByRef tSC As %Status) As %String
+{
+    Set tSC = $$$OK
+    set tInsert="INSERT INTO VX130.GlobalsToWatch(GlobalName,ClassName,NumberOfSubscripts,PrimaryKeys,FirstSubscript,SubscriptCompare) "_
+        "VALUES (':GlobalName',':ClassName',:NumberOfSubscripts,':PrimaryKeys',':FirstSubscript',':SubscriptCompare')"_$C(13,10)
+    Try {
+        set tSQL="SELECT VistaFile FROM CB.AttributeMap WHERE IRISClassName=? AND VistaFile IS NOT NULL ORDER BY VistaFile"
+        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,pIRISClassName)
+        set tI=0
+        while tRSet.%Next() {
+            set tID=tRSet.%Get("VistaFile")
+            &sql(SELECT GlobalNode into :tGlobalNode FROM Dim.VistaFieldv001 WHERE VistaFile=:tID and VistaFieldNumber='.01')
+            set tCode=$REPLACE(tInsert,":GlobalName",$PIECE($PIECE(tGlobalNode,"^",2),"(",1))
+            set tCode=$REPLACE(tCode,":ClassName",pIRISClassName)
+            set tSubList=$LISTFROMSTRING(tGlobalNode,,0)
+            set tCode=$REPLACE(tCode,":NumberOfSubscripts",$LISTLENGTH(tSubList))
+            set tCode=$REPLACE(tCode,":FirstSubscript",$PIECE($LISTGET(tSubList,1),"(",2))
+            set tCode=$REPLACE(tCode,"'D0'","NULL")
+
+            set tI=tI+1
+        }
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tCode
 }
 
 }
