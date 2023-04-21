@@ -37,6 +37,9 @@ ClassMethod BuildClass(pIRISClassName As %String) As %Status
         set tSC=..AddUpdateObject(tClassDef)
         quit:'tSC
 
+        set tSC=..AddSetMethods(tClassDef)
+        quit:'tSC
+
     }
     Catch ex {
         Set tSC=ex.AsStatus()
@@ -471,6 +474,124 @@ ClassMethod UpdateObjectCode(pIRISClassName As %String, ByRef tSC As %Status) As
         Set tSC=ex.AsStatus()
     }
     Return tCode
+}
+
+/// Description
+ClassMethod AddSetMethods(pClassDef As %Dictionary.ClassDefinition) As %Status
+{
+    Set tSC = $$$OK
+    Try {
+        set tIENList=##class(%ArrayOfDataTypes).%New()
+        set tClassName=pClassDef.Name
+        set tSQL="SELECT IRISPropertyName FROM CB.AttributeMap WHERE IRISClassName=? AND VistaFile IS NOT NULL ORDER BY VistaFile"
+        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,tClassName)
+        set tI=0
+        while tRSet.%Next() {
+            do tIENList.SetAt(tRSet.%Get("IRISPropertyName"),tI)
+            set tI=tI+1
+        }
+
+        kill tRSet,tSQL
+        set tSQL="SELECT ID FROM CB.AttributeMap WHERE IRISClassName=? AND VistaField IS NOT NULL"
+        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,tClassName)
+        while tRSet.%Next() {
+            set tID=tRSet.%Get("ID")
+            set tSC=..AddSetMethod(pClassDef,tID,tIENList)
+            quit:'tSC
+        }
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tSC
+}
+
+ClassMethod AddSetMethod(pClassDef As %Dictionary.ClassDefinition, pAMapID As %Integer, pIENList As %ArrayOfDataTypes) As %Status
+{
+    Set tSC = $$$OK
+    Try {
+        set tFormalSpec="pNS:%Integer"
+        set tCode=..SetMethodCode(pAMapID)
+        set tkey=""
+        for tI=1:1 {
+            set tPropertyName=pIENList.GetNext(.tkey)
+            quit:tkey=""
+            set tFormalSpec=tFormalSpec_",p"_tPropertyName_":%String"
+            set tCode=$REPLACE(tCode,("D"_tkey),"p"_tPropertyName)
+        }
+        set tAMap=##Class(CB.AttributeMap).%OpenId(pAMapID)
+
+        set tPropertyName=tAMap.IRISPropertyName
+
+        set tCodeStream=##class(%Stream.TmpCharacter).%New()
+        do tCodeStream.Write(tCode)
+        set tMethod=##class(%Dictionary.MethodDefinition).%New()
+        set tMethod.Name="set"_tPropertyName
+        set tMethod.parent=pClassDef
+        set tMethod.ClassMethod=0
+        set tMethod.Implementation=tCodeStream
+        set tMethod.FormalSpec=tFormalSpec
+        set tMethod.ReturnType="%Boolean"
+        set tSC = tMethod.%Save()
+        quit:'tSC
+        set tSC = pClassDef.Methods.Insert(tMethod)
+        quit:'tSC
+        set tSC = pClassDef.%Save()
+        quit:'tSC
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tSC
+}
+
+/// Description
+ClassMethod SetMethodCode(pAttributeID As %Integer, ByRef tSC As %Status) As %String
+{
+    Set tSC = $$$OK
+    
+    Try {
+        Set tAMap=##class(CB.AttributeMap).%OpenId(pAttributeID)
+        set tPropertyName=tAMap.IRISPropertyName
+        set tField=tAMap.VistaField
+        set tGlobal=tField.GlobalNode
+        set tPiece=tField.Piece
+              
+        set tCode=$C(9)_
+            "set tFlag=0"_$C(13,10,9)_
+            "set t"_tPropertyName_" = $PIECE($GET(^|pNS|"_$PIECE(tGlobal,"^",2)_"),""^"","_tPiece_")"_$C(13,10,9)
+        if (tAMap.DataDomain="WordProcessing") {
+
+        } elseif (tAMap.DataDomain="VariablePointerIEN") {
+
+        } elseif (tAMap.DataDomain="VariablePointer") {
+
+        } 
+
+        if (tAMap.DataType="%String") {
+            set tCode = tCode_
+                "set t"_tPropertyName_" = $EXTRACT(t"_tPropertyName_",1,"_tAMap.MaxLength_")"_$C(13,10,9)
+
+        } elseif (tAMap.DataType="%FilemanTimeStamp") {
+            set tCode = tCode_
+                "if ('##class(%FilemanTimeStamp).IsValid(t"_tPropertyName_")) {"_$C(13.10,9,9)_
+                    "set t"_tPropertyName_" = ""1410000"""_$C(13,10,9,9)_
+                    "kill %objlasterror"_$C(13,10,9)_
+                "}"_$C(13,10,9)
+        }
+        set tCode=tCode_
+            "if .."_tPropertyName_" '= t"_tPropertyName_" {"_$C(13,10,9,9)_
+            "set .."_tPropertyName_" = t"_tPropertyName_$C(13,10,9,9)_
+            "set tFlag = 1"_$C(13,10,9)_
+            "}"_$C(13,10,9)_
+            "kill t"_tPropertyName_$C(13,10,9)_
+            "return tFlag"_$C(13,10)
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    kill tAMap,tField,tPropertyName,tGlobal,tPiece
+    Return $GET(tCode)
 }
 
 }
