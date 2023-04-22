@@ -262,7 +262,10 @@ ClassMethod AddClassDescription(pClassDef As %Dictionary.ClassDefinition) As %St
             quit
         }
         set tFileDesciption=##class(CB.AttributeMap).%OpenId(tId).VistaField.VistaFile.VistaFileDescription
-        set pClassDef.Description="History: "_$C(13,10)_
+        set tGlobalsToWatch=..GlobalsToWatch(tClassName,.tSC)
+        quit:'tSC
+        set pClassDef.Description=tGlobalsToWatch_
+            "History: "_$C(13,10)_
             "Class Built by ClassBuilder v1.0 on "_$ZDATETIME($ZTIMESTAMP,3)_$C(13,10,13,10)_
             tFileDesciption
         set tSC=pClassDef.%Save()
@@ -407,7 +410,7 @@ ClassMethod BuildSiteCode(pIRISClassName As %String, ByRef tSC As %Status) As %S
             
             set tCode=tCode_tTab_"while +"_tPropertyName(tD)_" {"_$C(13,10)
             set tCodeEnd=tTab_$C(9)_"set "_tPropertyName(tD)_" = $ORDER(^|tNS|"_tGlobal_"))"_$C(13,10)_
-                tTab_"}"_$C(13,10)
+                tTab_"}"_$C(13,10)_tCodeEnd
             set tD=tD+1
             set tTab=tTab_$C(9)
         }
@@ -492,7 +495,7 @@ ClassMethod UpdateObjectCode(pIRISClassName As %String, ByRef tSC As %Status) As
                 "quit:(+"_tPropertyName(tD)_"'>0)"_$C(13,10,13,10,9,9)_
                 "if ($GET(^|tNS|"_$PIECE(tGlobalNode,"^",2)_")="""") {"_$C(13,10,9,9,9)_
                     "set tSC = ..RemoveObject(pSta3n,pFMPK)"_$C(13,10,9,9,9)_
-                    "quit"_$C(13,10,9,9)_"}"_$C(13,10)
+                    "quit"_$C(13,10,9,9)_"}"_$C(13,10,13,10,9,9)
             set tD=tD+1
         }
         kill tRSet,tSQL
@@ -644,17 +647,25 @@ ClassMethod AddSetMethod(pClassDef As %Dictionary.ClassDefinition, pAMapID As %I
 ClassMethod SetMethodCode(pAttributeID As %Integer, ByRef tSC As %Status) As %String
 {
     Set tSC = $$$OK
-    
     Try {
         Set tAMap=##class(CB.AttributeMap).%OpenId(pAttributeID)
         set tPropertyName=tAMap.IRISPropertyName
         set tField=tAMap.VistaField
         set tGlobal=tField.GlobalNode
         set tPiece=tField.Piece
+        
               
         set tCode=$C(9)_
-            "set tFlag=0"_$C(13,10,9)_
-            "set t"_tPropertyName_" = $PIECE($GET(^|pNS|"_$PIECE(tGlobal,"^",2)_"),""^"","_tPiece_")"_$C(13,10,9)
+            "set tFlag=0"_$C(13,10,9)
+            
+        if tField.VistaFieldNumber=".001" {
+            set tClassName=tAMap.IRISClassName
+            &sql(SELECT TOP 1 IRISPropertyName INTO :tIEN FROM CB.AttributeMap WHERE IRISClassName=:tClassName AND VistaFile IS NOT NULL ORDER BY VistaFile DESC)
+            set tCode=tCode_"set t"_tPropertyName_" = p"_tIEN_$C(13,10,9)
+        } else {
+            set tCode=tCode_"set t"_tPropertyName_" = $PIECE($GET(^|pNS|"_$PIECE(tGlobal,"^",2)_"),""^"","_tPiece_")"_$C(13,10,9)
+        }
+        
         if (tAMap.DataDomain="WordProcessing") {
 
         } elseif (tAMap.DataDomain="VariablePointerIEN") {
@@ -669,7 +680,7 @@ ClassMethod SetMethodCode(pAttributeID As %Integer, ByRef tSC As %Status) As %St
 
         } elseif (tAMap.DataType="%FilemanTimeStamp") {
             set tCode = tCode_
-                "if ('##class(%FilemanTimeStamp).IsValid(t"_tPropertyName_")) {"_$C(13.10,9,9)_
+                "if ('##class(%FilemanTimeStamp).IsValid(t"_tPropertyName_")) {"_$C(13,10,9,9)_
                     "set t"_tPropertyName_" = ""1401231"""_$C(13,10,9,9)_
                     "kill %objlasterror"_$C(13,10,9)_
                 "}"_$C(13,10,9)
@@ -746,7 +757,7 @@ ClassMethod RemoveObjectCode(pIRISClassName As %String, ByRef tSC As %Status) As
                 "quit:(+"_tPropertyName(tD)_"'>0)"_$C(13,10,13,10,9,9)_
                 "if ($GET(^|tNS|"_$PIECE(tGlobalNode,"^",2)_")='"""") {"_$C(13,10,9,9,9)_
                     "set tSC = ..UpdateObject(pSta3n,pFMPK)"_$C(13,10,9,9,9)_
-                    "quit"_$C(13,10,9,9)_"}"_$C(13,10)
+                    "quit"_$C(13,10,9,9)_"}"_$C(13,10,13,10,9,9)
             set tD=tD+1
         }
         kill tRSet,tSQL
@@ -783,27 +794,56 @@ ClassMethod RemoveObjectCode(pIRISClassName As %String, ByRef tSC As %Status) As
     Return tCode
 }
 
-/// Description
+/// Using the given IRIS classname and the primary keys from the CB.AttributeMap
+/// write the GlobalsToWatch INSERT code for the class.
 ClassMethod GlobalsToWatch(pIRISClassName As %String, ByRef tSC As %Status) As %String
 {
     Set tSC = $$$OK
     set tInsert="INSERT INTO VX130.GlobalsToWatch(GlobalName,ClassName,NumberOfSubscripts,PrimaryKeys,FirstSubscript,SubscriptCompare) "_
         "VALUES (':GlobalName',':ClassName',:NumberOfSubscripts,':PrimaryKeys',':FirstSubscript',':SubscriptCompare')"_$C(13,10)
+    set tCode=""
     Try {
         set tSQL="SELECT VistaFile FROM CB.AttributeMap WHERE IRISClassName=? AND VistaFile IS NOT NULL ORDER BY VistaFile"
         set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,pIRISClassName)
-        set tI=0
         while tRSet.%Next() {
+            set tCode=tCode_tInsert
             set tID=tRSet.%Get("VistaFile")
             &sql(SELECT GlobalNode into :tGlobalNode FROM Dim.VistaFieldv001 WHERE VistaFile=:tID and VistaFieldNumber='.01')
-            set tCode=$REPLACE(tInsert,":GlobalName",$PIECE($PIECE(tGlobalNode,"^",2),"(",1))
+            set tCode=$REPLACE(tCode,":GlobalName",$PIECE(tGlobalNode,"(",1))
             set tCode=$REPLACE(tCode,":ClassName",pIRISClassName)
-            set tSubList=$LISTFROMSTRING(tGlobalNode,,0)
-            set tCode=$REPLACE(tCode,":NumberOfSubscripts",$LISTLENGTH(tSubList))
-            set tCode=$REPLACE(tCode,":FirstSubscript",$PIECE($LISTGET(tSubList,1),"(",2))
+            set tSubList=$LISTFROMSTRING($PIECE($PIECE(tGlobalNode,"(",2),")",1),",",0)
+            set tNumberOfSubscripts=$LISTLENGTH(tSubList)
+            set tCode=$REPLACE(tCode,":NumberOfSubscripts",tNumberOfSubscripts)
+            set tCode=$REPLACE(tCode,":FirstSubscript",$LISTGET(tSubList,1))
             set tCode=$REPLACE(tCode,"'D0'","NULL")
-
-            set tI=tI+1
+            set tPrimaryKey=""
+            for tI=1:1 {
+                quit:$LISTGET(tSubList,tI)=""
+                if ($LISTGET(tSubList,tI)?1"D"1N) {
+                    set tPrimaryKey=tPrimaryKey_tI_","
+                }
+            } 
+            set tPrimaryKey=$EXTRACT(tPrimaryKey,1,($LENGTH(tPrimaryKey)-1))
+            set tCode=$REPLACE(tCode,":PrimaryKeys",tPrimaryKey)
+            set tSubscriptCompare=""
+            for tI=2:1:(tNumberOfSubscripts-1) {
+                if '($LISTGET(tSubList,tI)?1"D"1N) {
+                    set tSubscriptCompare=tSubscriptCompare_tI_":"
+                    set tSub=$LISTGET(tSubList,tI)
+                    if tSub["""" {
+                        set tSubscriptCompare=tSubscriptCompare_tSub_","
+                    } else {
+                        set tSubscriptCompare=tSubscriptCompare_""""_tSub_""","
+                    }
+                }
+            }
+            if tSubscriptCompare="" {
+                set tSubscriptCompare="NULL"
+            } else {
+                set tSubscriptCompare=$EXTRACT(tSubscriptCompare,1,($LENGTH(tSubscriptCompare)-1))
+            }
+            set tCode=$REPLACE(tCode,":SubscriptCompare",tSubscriptCompare)
+            set tCode=$REPLACE(tCode,"'NULL'","NULL")
         }
     }
     Catch ex {
