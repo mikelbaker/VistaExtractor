@@ -5,16 +5,16 @@ Class VX130.GlobalsToWatch Extends %Persistent
 Property GlobalName As %String(COLLATION = "EXACT", MAXLEN = 500);
 
 /// The FileMan file number if the first subscript is the file number.
-Property FirstSubscript As %String;
+Property FirstSubscript As %String(COLLATION = "EXACT", MAXLEN = 50);
 
 /// The number of subcripts the FileMan file or subfile uses to store data.
 Property NumberOfSubscripts As %Integer;
 
 /// If the FileMan file is a subfile this contains the subscript number and constant.
-Property SubscriptCompare As %String;
+Property SubscriptCompare As %String(COLLATION = "EXACT", MAXLEN = 200);
 
 /// A comma seperated list of subsripts that have the IENs that make the record unique.
-Property PrimaryKeys As %String;
+Property PrimaryKeys As %String(COLLATION = "EXACT", MAXLEN = 100);
 
 /// THe ClassName associated with the global and file or subfile.
 Property ClassName As %String(COLLATION = "EXACT", MAXLEN = 500);
@@ -51,9 +51,9 @@ ClassMethod Evaluate(pGlobalNode As %String, pType As %String, pSta3n As %Intege
         set tGlobalName=$QSUBSCRIPT(pGlobalNode,0)
         quit:'$DATA(^VX130.GlobalsToWatchI("GlobalNameIndex",tGlobalName))
         set tFirstSubscript=$QSUBSCRIPT(pGlobalNode,1)
-        if '$DATA(^VX130.GlobalsToWatchI("FirstSubsciptIndex",tGlobalName,tFirstSubscript)) {
-            if $DATA(^VX130.GlobalsToWatchI("FirstSubscriptIndex",tGlobalName," ")) {
-                set tFirstSubscript=" "
+        if '$DATA(^VX130.GlobalsToWatchI("FirstSubscriptIndex",tGlobalName,tFirstSubscript)) {
+            if $DATA(^VX130.GlobalsToWatchI("FirstSubscriptIndex",tGlobalName,-100000000000000)) {
+                set tFirstSubscript=-100000000000000
             } else {
                 quit
             }

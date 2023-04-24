@@ -491,7 +491,7 @@ ClassMethod UpdateObjectCode(pIRISClassName As %String, ByRef tSC As %Status) As
                 set tMethodSig=tMethodSig_",t"_tRSet.%Get("IRISPropertyName")
             }
 
-            set tCode=tCode_"set "_tPropertyName(tD)_" = $PIECE(pFMPK,""^"","_(tD+1)_")"_$c(13,10,9,9)_
+            set tCode=tCode_"set "_tPropertyName(tD)_" = $PIECE(pFMPK,"","","_(tD+1)_")"_$c(13,10,9,9)_
                 "quit:(+"_tPropertyName(tD)_"'>0)"_$C(13,10,13,10,9,9)_
                 "if ($GET(^|tNS|"_$PIECE(tGlobalNode,"^",2)_")="""") {"_$C(13,10,9,9,9)_
                     "set tSC = ..RemoveObject(pSta3n,pFMPK)"_$C(13,10,9,9,9)_
@@ -753,7 +753,7 @@ ClassMethod RemoveObjectCode(pIRISClassName As %String, ByRef tSC As %Status) As
             set tPropertyName(tD)="t"_tRSet.%Get("IRISPropertyName")
             set tId=tId_"_""||""_"_tPropertyName(tD)
 
-            set tCode=tCode_"set "_tPropertyName(tD)_" = $PIECE(pFMPK,""^"","_(tD+1)_")"_$c(13,10,9,9)_
+            set tCode=tCode_"set "_tPropertyName(tD)_" = $PIECE(pFMPK,"","","_(tD+1)_")"_$c(13,10,9,9)_
                 "quit:(+"_tPropertyName(tD)_"'>0)"_$C(13,10,13,10,9,9)_
                 "if ($GET(^|tNS|"_$PIECE(tGlobalNode,"^",2)_")='"""") {"_$C(13,10,9,9,9)_
                     "set tSC = ..UpdateObject(pSta3n,pFMPK)"_$C(13,10,9,9,9)_

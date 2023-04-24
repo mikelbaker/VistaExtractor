@@ -1,7 +1,7 @@
 {
     "objectscript.conn": {
         "active": true,
-        "server": "vx130-azure",
+        "server": "vx130-local",
         "ns": "VX130"
     },
     "sqltools.connections": [
