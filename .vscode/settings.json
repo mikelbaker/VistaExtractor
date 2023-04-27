@@ -17,6 +17,19 @@
             "driver": "InterSystems IRIS",
             "name": "vx130",
             "username": "mike"
+        },
+        {
+            "namespace": "vx130",
+            "connectionMethod": "Server and Port",
+            "showSystem": false,
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 52773,
+            "https": false,
+            "askForPassword": true,
+            "driver": "InterSystems IRIS",
+            "name": "vx130-local",
+            "username": "mike"
         }
     ]
 }

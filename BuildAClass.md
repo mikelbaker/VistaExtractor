@@ -15,3 +15,6 @@ FROM CB.AttributeMap
 --UPDATE  CB.AttributeMap set IRISPropertyName='CDCValue' where ID=5
 --UPDATE  CB.AttributeMap set IRISPropertyName='PTFValue' where ID=6
 
+docker exec -it v08 iris session iris -U VX130 "##class(CB.AttributeMap).New(3354,\"SStaff.SStaff200v001\")"
+
+SELECT * FROM CB.AttributeMap WHERE VistaFile=3354

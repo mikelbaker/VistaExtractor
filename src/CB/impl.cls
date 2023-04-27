@@ -33,8 +33,9 @@ ClassMethod GetSiteFile(sta3n As %String, filenumber As %String) As %Stream.Obje
 ///     filenumber<br/>
 ClassMethod GetSiteFields(sta3n As %String, filenumber As %String) As %Stream.Object
 {
-    //(Place business logic here)
-    //Do ..%SetStatusCode(<HTTP_status_code>)
+    set tFieldArray=##class(Dim.VistaFieldv001).GetSiteFieldList(sta3n,filenumber)
+    Do ..%SetStatusCode("200")
+    return tFieldArray.%ToJSON()
     //Do ..%SetHeader(<name>,<value>)
     //Quit (Place response here) ; response may be a string, stream or dynamic object
 }

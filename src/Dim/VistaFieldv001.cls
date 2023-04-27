@@ -438,14 +438,24 @@ Method setVistaFieldNumericScale(pNS As %String, pVistaFileNumber As %String, pV
 
 ClassMethod GetSiteFieldList(pSta3n As %Integer, pVistaFileNumber As %String, ByRef tsc As %Status) As %DynamicArray
 {
+    #Dim tFMField as Dim.VistaFieldv001
     Set tsc = $$$OK
     Try {
-        set tSQL="SELECT ID FROM Dim.VistaFieldv001 WHERE Sta3n=? AND VistaFileNumber=? AND OpCode IS NULL"
+        set tSQL="SELECT %NOLOCK ID FROM Dim.VistaFieldv001 WHERE Sta3n=? AND VistaFileNumber=? AND OpCode IS NULL"
         set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,pSta3n,pVistaFileNumber)
         set tFieldArray=##class(%DynamicArray).%New()
         while tRSet.%Next() {
-            do ..%OpenId(tRSet.%Get("ID")).%JSONExportToString(.tField)
-            do tFieldArray.%Push(tField)
+            set tOBJ={}
+            set tFMField=..%OpenId(tRSet.%Get("ID"))
+            do tOBJ.%Set("id",tFMField.%Id())
+            do tOBJ.%Set("VistaFieldNumber",tFMField.VistaFieldNumber)
+            do tOBJ.%Set("VistaFieldName",tFMField.VistaFieldName)
+
+            //do ..%OpenId(tRSet.%Get("ID")).%JSONExportToStream(.tField)
+            //do tFieldArray.%Push(##class(%DynamicAbstractObject).%FromJSON(tField))
+            do tFieldArray.%Push(tOBJ)
+            kill tFMField
+            
         }
     }
     Catch ex {
