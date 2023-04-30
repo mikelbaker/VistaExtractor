@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   web:
-    image: intersystems/webgateway:2023.1.0.207.0
+    image: intersystems/webgateway:2023.1.0.218.0
     environment:
       - ISC_DATA_DIRECTORY=/webconf
     volumes:
