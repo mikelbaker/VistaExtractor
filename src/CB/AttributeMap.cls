@@ -169,6 +169,63 @@ ClassMethod DeleteAttributeMap(pIRISClassName As %String) As %Status
     Return sc
 }
 
+/// Description
+ClassMethod AddMap(pIRISClassName As %String, pFMFieldId As %Integer) As %Status
+{
+    Set sc = $$$OK
+    Try {
+        set tSQL="SELECT ID,VistaFieldName,VistaFieldType,VistaFieldNumericScale "_
+            "FROM Dim.VistaFieldv001 WHERE ID=? "
+        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,pFMFieldId)
+        while tRSet.%Next() {
+            set tPointer=0
+            set tSoC=0
+            set tAMap=..%New()
+            set tAMap.IRISClassName=pIRISClassName
+            set tVistaField=##class(Dim.VistaFieldv001).%OpenId(tRSet.%Get("ID"))
+            set tAMap.VistaField=tVistaField
+            set tType=tRSet.%Get("VistaFieldType")
+            if tType["Date" {
+                set tType="%FilemanTimeStamp"
+            } elseif tType["Numeric" {
+                set tType="%Numeric"
+                set tVistaFieldNumericScale=tRSet.%Get("VistaFieldNumericScale")
+                set tAMap.NumericScale=tVistaFieldNumericScale
+                if $PIECE(tVistaFieldNumericScale,",",2)=0 {
+                    set tType="%Integer"
+                } 
+            } elseif tType="Pointer" {
+                set tPointer=1
+                set tType="%String"
+                set tAMap.MaxLength=50
+            } elseif tType="SetOfCodes" {
+                set tSoC=1
+                set tType="%String"
+                set tAMap.MaxLength=50
+            } elseif (tType="WordProcessing") {
+                set tAMap.MaxLength=8000
+            } else {
+                set tType="%String"
+                if tVistaField.VistaFieldLength]"" {
+                    set tAMap.MaxLength=tVistaField.VistaFieldLength
+                } else {
+                    set tAMap.MaxLength=50
+                }
+                
+            }
+            set tAMap.DataType=tType
+            set tAMap.IRISPropertyName=..FMToIRIS(tRSet.%Get("VistaFieldName"),tPointer,tSoC)
+            
+            set tSC=tAMap.%Save()
+            quit:$$$ISERR(tSC)
+        }
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return sc
+}
+
 Storage Default
 {
 <Data name="AttributeMapDefaultData">

@@ -72,13 +72,4 @@ services:
     hostname: vx130
     ports:
       - 52773:52773
-  swagger:
-    image: swaggerapi/swagger-ui
-    volumes:
-      - ./apis:/apis
-    environment:
-      - SWAGGER_JSON=/apis/cb.json 
-    ports:
-      - 8080:8080
-    container_name: swagger
-    hostname: swagger
+  

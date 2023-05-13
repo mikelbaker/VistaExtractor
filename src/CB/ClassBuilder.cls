@@ -94,7 +94,10 @@ ClassMethod BuildClass(pIRISClassName As %String) As %Status
         set tSC=..AddSetMethods(tClassDef)
         quit:'tSC
 
-
+        set tIO="./OutputFile"
+        OPEN tIO:("NWS")
+        USE tIO do $SYSTEM.OBJ.Compile(pIRISClassName,"cuk")
+        CLOSE tIO
 
     }
     Catch ex {
