@@ -70,6 +70,8 @@ services:
       - IRIS_INSTANCE=VX130
     container_name: vx130
     hostname: vx130
+  classbuilder:
+    image: classbuilder
     ports:
-      - 52773:52773
-  
+      - 8080:80
+    hostname: classbuilder

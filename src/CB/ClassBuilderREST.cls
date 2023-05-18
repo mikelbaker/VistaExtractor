@@ -20,6 +20,12 @@ XData UrlMap [ XMLNamespace = "http://www.intersystems.com/urlmap" ]
     <Route Url="/addattributes" Method="POST" Call="AddAttributeMap" />
     <!-- return the status of building a class-->
     <Route Url="/buildclass/:irisclass" Method="GET" Call="BuildClass" />
+    <!-- Return an array of Attribute maps for a given ClassName -->
+    <Route Url="/mappedclasses/:IRISClassName" Method="GET" Call="GetAMapClass" />
+    <!-- Return an array of Attribute maps for a given ClassName -->
+    <Route Url="/mappedclasses/edit/:id" Method="GET" Call="GetAMapObject" />
+    <!-- Return an array of Attribute maps for a given ClassName -->
+    <Route Url="/mappedclasses/edit/:id" Method="POST" Call="EditAttributeMap" />
 </Routes>
 }
 
@@ -165,6 +171,7 @@ ClassMethod AddAttributeMap() As %Status
     Set tSC = $$$OK
     Try {
         set tdata = %request.Content.Read()
+        set ^zdata(1)=tdata
         set tObj = {}.%FromJSON(tdata)
         set tIRISClassName = tObj.%Get("schema")_"."_tObj.%Get("table")
         set tSta3n = tObj.%Get("sta3n")
@@ -179,7 +186,12 @@ ClassMethod AddAttributeMap() As %Status
             set tSC=##class(CB.AttributeMap).AddMap(tIRISClassName,tId)
         }
         &sql(SELECT ID INTO :tId FROM Dim.VistaFilev001 WHERE VistaFileNumber=:tFileNumber AND Sta3n = :tSta3n)
-        set tSC=##class(CB.AttributeMap).AddPrimaryKeys(tId,tIRISClassName)
+        set tSC=##class(CB.AttributeMap).AddPrimaryKeys(tId,tIRISClassName,.tParentVistaFile)
+        quit:'tSC
+        while $GET(tParentVistaFile)]"" {
+            set tSC=##class(CB.AttributeMap).AddPrimaryKeys(tParentVistaFile,tIRISClassName,.tParentVistaFile)
+            quit:'tSC
+        }
 
     }
     Catch ex {
@@ -199,6 +211,106 @@ ClassMethod BuildClass(pIRISClassName As %String) As %Status
     }
     Catch ex {
         Set tSC=ex.AsStatus()
+    }
+    Return tSC
+}
+
+/// Return an array of Attribute maps for a given ClassName
+ClassMethod GetAMapClass(pIRISClassName As %String) As %Status
+{
+	Set tSC = $$$OK
+    set tArray = []
+	Try
+	{
+        set tSQL="Select %NOLOCK ID,DataDomain,DataType, IRISClassName, IRISPropertyName,MaxLength,NumericScale"_
+        " FROM CB.AttributeMap WHERE IRISClassName=?"
+        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,pIRISClassName)
+		While tRSet.%Next()
+		{
+            set tObj={}
+            do tObj.%Set("id",tRSet.%Get("ID"))
+            do tObj.%Set("DataDomain",tRSet.%Get("DataDomain"))
+            do tObj.%Set("DataType",tRSet.%Get("DataType"))
+            do tObj.%Set("IRISPropertyName",tRSet.%Get("IRISPropertyName"))
+            do tObj.%Set("MaxLength",tRSet.%Get("MaxLength"))
+            do tObj.%Set("NumericScale",tRSet.%Get("NumericScale"))
+            do tObj.%Set("IRISClassName",tRSet.%Get("IRISClassName"))
+			Do tArray.%Push(tObj)
+		}
+	}
+	Catch ex
+	{
+		Set tSC = ex.AsStatus() 
+	}
+	write tArray.%ToJSON()
+	kill tArray,tRSet,tStatement,tObj
+	Return tSC
+}
+
+/// Return an array of Attribute maps for a given ClassName
+ClassMethod GetAMapObject(pID As %String) As %Status
+{
+	Set tSC = $$$OK
+    set tArray = []
+	Try
+	{
+        set tSQL="Select %NOLOCK TOP 1 ID,DataDomain,DataType, IRISClassName, IRISPropertyName,MaxLength,NumericScale"_
+        " FROM CB.AttributeMap WHERE ID=?"
+        set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL,pID)
+		While tRSet.%Next()
+		{
+            set tObj={}
+            do tObj.%Set("id",tRSet.%Get("ID"))
+            do tObj.%Set("DataDomain",tRSet.%Get("DataDomain"))
+            do tObj.%Set("DataType",tRSet.%Get("DataType"))
+            do tObj.%Set("IRISPropertyName",tRSet.%Get("IRISPropertyName"))
+            do tObj.%Set("MaxLength",tRSet.%Get("MaxLength"))
+            do tObj.%Set("NumericScale",tRSet.%Get("NumericScale"))
+            do tObj.%Set("IRISClassName",tRSet.%Get("IRISClassName"))
+			Do tArray.%Push(tObj)
+		}
+	}
+	Catch ex
+	{
+		Set tSC = ex.AsStatus() 
+	}
+	write tArray.%ToJSON()
+	kill tArray,tRSet,tStatement,tObj
+	Return tSC
+}
+
+/// Description
+ClassMethod EditAttributeMap(pId As %String) As %Status
+{
+    #Dim tAMap As CB.AttributeMap
+    Set tSC = $$$OK
+    Try {
+        set tdata = %request.Content.Read()
+        s tTemp=$REPLACE(tdata,"\","")
+        if $EXTRACT(tTemp,1)="""" {
+            set tObj = {}.%FromJSON($EXTRACT(tTemp,2,$LENGTH(tTemp)-1))
+        } else {
+            set tObj = {}.%FromJSON(tdata)
+        }
+        
+        set tIRISPropertyName = tObj.%Get("IRISPropertyName")
+        set tDataDomain = tObj.%Get("DataDomain")
+        set tDataType = tObj.%Get("DataType")
+        set tMaxLength = tObj.%Get("MaxLength")
+        set tNumericScale = tObj.%Get("NumericScale")
+
+        set tAMap = ##class(CB.AttributeMap).%OpenId(pId)
+        set:tAMap.IRISPropertyName'=tIRISPropertyName tAMap.IRISPropertyName=tIRISPropertyName
+        set:tAMap.DataDomain'=tDataDomain tAMap.DataDomain=tDataDomain
+        set:tAMap.DataType'=tDataType tAMap.DataType=tDataType
+        set:tAMap.MaxLength'=tMaxLength tAMap.MaxLength=tMaxLength
+        set:tAMap.NumericScale'=tNumericScale tAMap.NumericScale=tNumericScale
+        set tSC=tAMap.%Save()
+
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+        set ^zdata(3)=tSC
     }
     Return tSC
 }
