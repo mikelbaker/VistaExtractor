@@ -1,6 +1,8 @@
 
-#docker exec -it vx130 iris session iris -U vx130 "##class(%SYSTEM.OBJ).LoadDir(`"/code/src/`",`"cku`",,1)"
-
+#docker exec -it vx130 iris session iris -U vx130 '##class(%SYSTEM.OBJ).LoadDir("/code/src/","cku",,1)'
+docker cp .\loadcode vx130:/tmp/
+docker exec -it --user root vx130 chmod +x /tmp/loadcode
+docker exec -it vx130 /tmp/loadcode
 
 docker exec -it v08 iris session iris -U vx130 "##class(VX130.IRISInstance).Init()"
 docker exec -it v08 iris session iris -U vx130 "##class(VX130.VistaSite).Init()"

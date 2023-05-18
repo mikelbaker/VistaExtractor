@@ -1,0 +1,2 @@
+#!/bin/bash
+iris session iris -U vx130 '##class(%SYSTEM.OBJ).LoadDir("/code/src/","cku",,1)'
