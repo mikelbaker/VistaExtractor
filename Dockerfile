@@ -1,6 +1,6 @@
 # Start with latest iris image
 #FROM intersystems/iris:2022.1.2.574.0
-FROM intersystems/iris:2023.1.0.218.0
+FROM intersystems/iris:2023.2.0.201.0
 # change to root user
 USER root
 # Create a directory for the IRIS system files

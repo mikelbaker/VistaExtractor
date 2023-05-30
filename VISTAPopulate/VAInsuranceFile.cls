@@ -1,5 +1,5 @@
 /// A Class that contains all of the Insurance records from the INSURANCE COMPANY File # 36
-Class VISTA.VAInsuranceFile Extends %Persistent
+Class VISTAPopulate.VAInsuranceFile Extends %Persistent
 {
 
 Property IEN As %Integer;
@@ -84,11 +84,11 @@ Storage Default
 <Value>Fax</Value>
 </Value>
 </Data>
-<DataLocation>^VISTA.VAInsuranceFileD</DataLocation>
+<DataLocation>^VISTAPopulate.VAInsuranceFileD</DataLocation>
 <DefaultData>VAInsuranceFileDefaultData</DefaultData>
-<IdLocation>^VISTA.VAInsuranceFileD</IdLocation>
-<IndexLocation>^VISTA.VAInsuranceFileI</IndexLocation>
-<StreamLocation>^VISTA.VAInsuranceFileS</StreamLocation>
+<IdLocation>^VISTAPopulate.VAInsuranceFileD</IdLocation>
+<IndexLocation>^VISTAPopulate.VAInsuranceFileI</IndexLocation>
+<StreamLocation>^VISTAPopulate.VAInsuranceFileS</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 

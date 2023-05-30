@@ -1,5 +1,5 @@
 /// A Class that contains all of the Marital Status records from the MARITAL STATUS File # 11
-Class VISTA.VAMaritalStatusFile Extends %Persistent
+Class VISTAPopulate.VAMaritalStatusFile Extends %Persistent
 {
 
 Property MaritalStatus As %String(COLLATION = "EXACT");
@@ -50,11 +50,11 @@ Storage Default
 <Value>IEN</Value>
 </Value>
 </Data>
-<DataLocation>^VISTA.VAMaritalStatusFileD</DataLocation>
+<DataLocation>^VISTAPopulate.VAMaritalStC7B6D</DataLocation>
 <DefaultData>VAMaritalStatusFileDefaultData</DefaultData>
-<IdLocation>^VISTA.VAMaritalStatusFileD</IdLocation>
-<IndexLocation>^VISTA.VAMaritalStatusFileI</IndexLocation>
-<StreamLocation>^VISTA.VAMaritalStatusFileS</StreamLocation>
+<IdLocation>^VISTAPopulate.VAMaritalStC7B6D</IdLocation>
+<IndexLocation>^VISTAPopulate.VAMaritalStC7B6I</IndexLocation>
+<StreamLocation>^VISTAPopulate.VAMaritalStC7B6S</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 

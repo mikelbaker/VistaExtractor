@@ -1,4 +1,4 @@
-Class VISTA.Patient Extends (%Persistent, %Populate)
+Class VISTAPopulate.Patient Extends (%Persistent, %Populate)
 {
 
 Property Name As %String(COLLATION = "EXACT");
@@ -19,23 +19,23 @@ Property ZIP As %String;
 
 Property Phone As %String;
 
-Property Race As VISTA.VARaceFile;
+Property Race As VISTAPopulate.VARaceFile;
 
-Property Ethnicity As VISTA.VAEthnicityFile;
+Property Ethnicity As VISTAPopulate.VAEthnicityFile;
 
 Property EmploymentStatus As %String(DISPLAYLIST = ",EMPLOYED FULL TIME,EMPLOYED PART TIME,NOT EMPLOYED,SELF EMPLOYED,RETIRED,ACTIVE MILITARY DUTY,UNKNOWN", VALUELIST = ",1,2,3,4,5,6,9");
 
-Property Insurance As VISTA.VAInsuranceFile;
+Property Insurance As VISTAPopulate.VAInsuranceFile;
 
-Property Occupation As VISTA.OccupationData;
+Property Occupation As VISTAPopulate.OccupationData;
 
 Property Veteran As %Boolean;
 
 Property IntegrationControlNumber As %Integer(MAXVAL = 500000, MINVAL = 10000);
 
-Property MaritalStatus As VISTA.VAMaritalStatusFile;
+Property MaritalStatus As VISTAPopulate.VAMaritalStatusFile;
 
-Property TypeOfPatient As VISTA.VATypeOfPatientFile;
+Property TypeOfPatient As VISTAPopulate.VATypeOfPatientFile;
 
 Index SSNIndex On SSN [ Unique ];
 
@@ -163,11 +163,11 @@ Storage Default
 <Value>TypeOfPatient</Value>
 </Value>
 </Data>
-<DataLocation>^VISTA.PatientD</DataLocation>
+<DataLocation>^VISTAPopulate.PatientD</DataLocation>
 <DefaultData>PatientDefaultData</DefaultData>
-<IdLocation>^VISTA.PatientD</IdLocation>
-<IndexLocation>^VISTA.PatientI</IndexLocation>
-<StreamLocation>^VISTA.PatientS</StreamLocation>
+<IdLocation>^VISTAPopulate.PatientD</IdLocation>
+<IndexLocation>^VISTAPopulate.PatientI</IndexLocation>
+<StreamLocation>^VISTAPopulate.PatientS</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 

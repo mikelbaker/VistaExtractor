@@ -1,5 +1,5 @@
 /// A Class that contains all of the Patient Types From the TYPE OF PATIENT File # 391
-Class VISTA.VATypeOfPatientFile Extends %Persistent
+Class VISTAPopulate.VATypeOfPatientFile Extends %Persistent
 {
 
 Property TypeOfPatient As %String(COLLATION = "EXACT");
@@ -78,11 +78,11 @@ Storage Default
 <Value>IEN</Value>
 </Value>
 </Data>
-<DataLocation>^VISTA.VATypeOfPatientFileD</DataLocation>
+<DataLocation>^VISTAPopulate.VATypeOfPatiE90D</DataLocation>
 <DefaultData>VATypeOfPatientFileDefaultData</DefaultData>
-<IdLocation>^VISTA.VATypeOfPatientFileD</IdLocation>
-<IndexLocation>^VISTA.VATypeOfPatientFileI</IndexLocation>
-<StreamLocation>^VISTA.VATypeOfPatientFileS</StreamLocation>
+<IdLocation>^VISTAPopulate.VATypeOfPatiE90D</IdLocation>
+<IndexLocation>^VISTAPopulate.VATypeOfPatiE90I</IndexLocation>
+<StreamLocation>^VISTAPopulate.VATypeOfPatiE90S</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 

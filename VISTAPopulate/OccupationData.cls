@@ -1,4 +1,4 @@
-Class VISTA.OccupationData Extends %Persistent
+Class VISTAPopulate.OccupationData Extends %Persistent
 {
 
 Property OccupationName As %String(COLLATION = "EXACT");
@@ -93,11 +93,11 @@ Storage Default
 <Value>OccupationName</Value>
 </Value>
 </Data>
-<DataLocation>^VISTA.OccupationDataD</DataLocation>
+<DataLocation>^VISTAPopulate.OccupationDataD</DataLocation>
 <DefaultData>OccupationDataDefaultData</DefaultData>
-<IdLocation>^VISTA.OccupationDataD</IdLocation>
-<IndexLocation>^VISTA.OccupationDataI</IndexLocation>
-<StreamLocation>^VISTA.OccupationDataS</StreamLocation>
+<IdLocation>^VISTAPopulate.OccupationDataD</IdLocation>
+<IndexLocation>^VISTAPopulate.OccupationDataI</IndexLocation>
+<StreamLocation>^VISTAPopulate.OccupationDataS</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 

@@ -1,5 +1,5 @@
 /// A Class that contains all of the Race records from the RACE File # 10
-Class VISTA.VARaceFile Extends %Persistent
+Class VISTAPopulate.VARaceFile Extends %Persistent
 {
 
 Property Race As %String(COLLATION = "EXACT");
@@ -75,11 +75,11 @@ Storage Default
 <Value>IEN</Value>
 </Value>
 </Data>
-<DataLocation>^VISTA.VARaceFileD</DataLocation>
+<DataLocation>^VISTAPopulate.VARaceFileD</DataLocation>
 <DefaultData>VARaceFileDefaultData</DefaultData>
-<IdLocation>^VISTA.VARaceFileD</IdLocation>
-<IndexLocation>^VISTA.VARaceFileI</IndexLocation>
-<StreamLocation>^VISTA.VARaceFileS</StreamLocation>
+<IdLocation>^VISTAPopulate.VARaceFileD</IdLocation>
+<IndexLocation>^VISTAPopulate.VARaceFileI</IndexLocation>
+<StreamLocation>^VISTAPopulate.VARaceFileS</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 

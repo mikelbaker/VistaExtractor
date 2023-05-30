@@ -14,11 +14,11 @@ mkdir -p wpb/code wpb/db/rou wpb/jrn/jrn wpb/jrn/alt wpb/sys
 mkdir -p v08/code v08/db/v08/bay/rou v08/db/v08/tam/rou v08/db/v08/wpb/rou v08/jrn/jrn v08/jrn/alt v08/sys
 mkdir -p vx130/code vx130/db/vx130/vx130code vx130/db/vx130/vx130data vx130/jrn/jrn vx130/jrn/alt vx130/sys
 
-docker run -v ./bay/code:/code -v ./bay/sys:/irissys -v ./bay/db:/irisdb -v ./bay/jrn:/irisjrn --name bay -d intersystems/iris:2023.1.0.207.0
-docker run -v ./tam/code:/code -v ./tam/sys:/irissys -v ./tam/db:/irisdb -v ./tam/jrn:/irisjrn --name tam -d intersystems/iris:2023.1.0.207.0
-docker run -v ./wpb/code:/code -v ./wpb/sys:/irissys -v ./wpb/db:/irisdb -v ./wpb/jrn:/irisjrn --name wpb -d intersystems/iris:2023.1.0.207.0
-docker run -v ./v08/code:/code -v ./v08/sys:/irissys -v ./v08/db:/irisdb -v ./v08/jrn:/irisjrn --name v08 -d intersystems/iris:2023.1.0.207.0
-docker run -v ./vx130/code:/code -v ./vx130/sys:/irissys -v ./vx130/db:/irisdb -v ./vx130/jrn:/irisjrn --name vx130 -d intersystems/iris:2023.1.0.207.0
+docker run -v $(pwd)/bay/code:/code -v $(pwd)/bay/sys:/irissys -v $(pwd)/bay/db:/irisdb -v $(pwd)/bay/jrn:/irisjrn --name bay -d intersystems/iris:2023.2.0.201.0
+docker run -v $(pwd)/tam/code:/code -v $(pwd)/tam/sys:/irissys -v $(pwd)/tam/db:/irisdb -v $(pwd)/tam/jrn:/irisjrn --name tam -d intersystems/iris:2023.2.0.201.0
+docker run -v $(pwd)/wpb/code:/code -v $(pwd)/wpb/sys:/irissys -v $(pwd)/wpb/db:/irisdb -v $(pwd)/wpb/jrn:/irisjrn --name wpb -d intersystems/iris:2023.2.0.201.0
+docker run -v $(pwd)/v08/code:/code -v $(pwd)/v08/sys:/irissys -v $(pwd)/v08/db:/irisdb -v $(pwd)/v08/jrn:/irisjrn --name v08 -d intersystems/iris:2023.2.0.201.0
+docker run -v $(pwd)/vx130/code:/code -v $(pwd)/vx130/sys:/irissys -v $(pwd)/vx130/db:/irisdb -v $(pwd)/vx130/jrn:/irisjrn --name vx130 -d intersystems/iris:2023.2.0.201.0
 sleep 20
 
 docker exec -it --user root bay chown -R irisowner:irisowner /irisdb /irisjrn /irissys /code

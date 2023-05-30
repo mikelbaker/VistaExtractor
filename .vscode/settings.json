@@ -1,8 +1,8 @@
 {
     "objectscript.conn": {
         "active": true,
-        "server": "bay",
-        "ns": "DLOAD"
+        "server": "vx130",
+        "ns": "VX130"
     },
     "sqltools.connections": [
         {

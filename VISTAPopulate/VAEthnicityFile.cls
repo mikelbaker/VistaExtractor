@@ -1,5 +1,5 @@
 /// A Class that contains all of the Ethnicity records from the ETHNICITY File # 10.2
-Class VISTA.VAEthnicityFile Extends %Persistent
+Class VISTAPopulate.VAEthnicityFile Extends %Persistent
 {
 
 Property Ethnicity As %String(COLLATION = "EXACT");
@@ -75,11 +75,11 @@ Storage Default
 <Value>IEN</Value>
 </Value>
 </Data>
-<DataLocation>^VISTA.VAEthnicityFileD</DataLocation>
+<DataLocation>^VISTAPopulate.VAEthnicityFileD</DataLocation>
 <DefaultData>VAEthnicityFileDefaultData</DefaultData>
-<IdLocation>^VISTA.VAEthnicityFileD</IdLocation>
-<IndexLocation>^VISTA.VAEthnicityFileI</IndexLocation>
-<StreamLocation>^VISTA.VAEthnicityFileS</StreamLocation>
+<IdLocation>^VISTAPopulate.VAEthnicityFileD</IdLocation>
+<IndexLocation>^VISTAPopulate.VAEthnicityFileI</IndexLocation>
+<StreamLocation>^VISTAPopulate.VAEthnicityFileS</StreamLocation>
 <Type>%Storage.Persistent</Type>
 }
 
