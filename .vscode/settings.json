@@ -1,6 +1,6 @@
 {
     "objectscript.conn": {
-        "active": true,
+        "active": false,
         "server": "vx130",
         "ns": "VX130"
     },

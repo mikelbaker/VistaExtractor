@@ -74,4 +74,5 @@ services:
     image: classbuilder
     ports:
       - 8080:80
+    container_name: classbuilder
     hostname: classbuilder

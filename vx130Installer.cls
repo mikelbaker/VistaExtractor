@@ -45,5 +45,28 @@ ClassMethod EnableECPService() As %Status
   return tsc
 }
 
+/// Description
+ClassMethod AddAPI() As %Status
+{
+  Set tSC = $$$OK
+  Try {
+    set name="/api/cb"
+    set app=##class(Security.Applications).%OpenId(name)
+    if '$ISOBJECT(app)
+    {
+      set Properties("AutheEnabled")=32
+      set Properties("CSPZENEnabled")=1
+      set Properties("Description")="ClassBuilder REST APIs"
+      set Properties("DispatchClass")="CB.ClassBuilderREST"
+      set Properties("Enabled")=1
+      set Properties("NameSpace")="VX130"
+      set tSC=##class(Security.Applications).Create(name,.Properties)
+    }
+  }
+  Catch ex {
+    Set tSC=ex.AsStatus()
+  }
+  Return tSC
+}
 
 }

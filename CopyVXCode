@@ -18,3 +18,5 @@ docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFilev001).Build
 docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFieldv001).BuildSite(516)"
 docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFieldv001).BuildSite(548)"
 docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFieldv001).BuildSite(673)"
+
+docker exec -it vx130 iris session iris -U %SYS "##class(vx130.Installer).AddAPI()"

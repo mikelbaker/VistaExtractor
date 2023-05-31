@@ -62,11 +62,9 @@ next you will need to load the VistaExtractor code into the VX130 database serve
 
 
 Create the ClassBuilder APIS
-1.  Using Postman create the APIs using the OpenAPI defintion in ./apis/cb.json
-    a. Copy the ./apis/cb.json file and paste in postman body.
-    b. set the url to http://localhost/vx130/api/mgmnt/v2/VX130/CB
-    c. Set the TYPE to POST
-    d. Set the Authentication to basic and add your username and password.
+1.  docker exec -it vx130 iris session iris -U %SYS "##class(vx130.Installer).AddAPI()"
 
+to run the attributeMap:
 
-Swagger - Azure
+http://localhost
+
