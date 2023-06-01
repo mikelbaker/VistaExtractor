@@ -12,7 +12,7 @@ ClassMethod GetReferenceData() As %Status
     do ##class(VISTAPopulate.VAEthnicityFile).PopulateFromVISTA()
     do ##class(VISTAPopulate.OccupationData).Populate()
     do ##class(VISTAPopulate.Patient).Populate(100)
-    set tSQL="SELECT %NOLOCK ID FROM VISTA.Patient"
+    set tSQL="SELECT %NOLOCK ID FROM VISTAPopulate.Patient"
     set tRSet=##class(%SQL.Statement).%ExecDirect(.tStatement,tSQL)
     while tRSet.%Next() {
         set tID=tRSet.%Get("ID")
