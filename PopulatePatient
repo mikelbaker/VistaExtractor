@@ -1,0 +1,6 @@
+docker exec -it bay iris session iris -U VAH "##class(VISTAPopulate.PopulatePatient).GetReferenceData()"
+docker exec -it tam iris session iris -U VAH "##class(VISTAPopulate.PopulatePatient).GetReferenceData()"
+docker exec -it wpb iris session iris -U VAH "##class(VISTAPopulate.PopulatePatient).GetReferenceData()"
+docker exec -it v08 iris session iris -U VX130 "##class(Dim.State5v001).BuildSite(516)"
+docker exec -it v08 iris session iris -U VX130 "##class(Dim.State5v001).BuildSite(548)"
+docker exec -it v08 iris session iris -U VX130 "##class(Dim.State5v001).BuildSite(673)"

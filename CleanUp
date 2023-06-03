@@ -33,6 +33,9 @@ docker cp vistaInstaller.cls wpb:/code/
 docker cp v08Installer.cls v08:/code/
 docker cp vx130Installer.cls vx130:/code/
 docker cp src vx130:/code/
+docker cp VISTAPopulate bay:/code/
+docker cp VISTAPopulate tam:/code/
+docker cp VISTAPopulate wpb:/code/
 
 docker stop bay
 docker stop tam

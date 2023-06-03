@@ -94,6 +94,9 @@ ClassMethod BuildClass(pIRISClassName As %String) As %Status
         set tSC=..AddSetMethods(tClassDef)
         quit:'tSC
 
+        set tSC=..AddToSDA(tClassDef)
+        quit:'tSC
+
         set tIO="./OutputFile"
         OPEN tIO:("NWS")
         USE tIO do $SYSTEM.OBJ.Compile(pIRISClassName,"cuk")
@@ -853,6 +856,38 @@ ClassMethod GlobalsToWatch(pIRISClassName As %String, ByRef tSC As %Status) As %
         Set tSC=ex.AsStatus()
     }
     Return tCode
+}
+
+/// Description
+ClassMethod AddToSDA(pClassDef As %Dictionary.ClassDefinition) As %Status
+{
+    Set tSC = $$$OK
+    Try {
+        Set tClassName=pClassDef.Name
+        &SQL(SELECT TOP 1 SDAClassName INTO :tSDAClass FROM SDA.AttributeMap WHERE VX130ClassName=:tClassName)
+        quit:+$GET(tSDAClass)']"" 
+        
+        set tCodeStream=##class(%Stream.TmpCharacter).%New()
+        do tCodeStream.Write(##class(SDA.AttributeMap).SDACode(tClassName))
+        set tMethod=##class(%Dictionary.MethodDefinition).%New()
+        set tMethod.Name="ToSDA"
+        set tMethod.parent=pClassDef
+        set tMethod.ClassMethod=1
+        set tMethod.Implementation=tCodeStream
+        set tMethod.FormalSpec="pId:%String,&pSC:%Status"
+        set tMethod.ReturnType=tSDAClass
+        set tSC = tMethod.%Save()
+        quit:'tSC
+        set tSC = pClassDef.Methods.Insert(tMethod)
+        quit:'tSC
+        set tSC = pClassDef.%Save()
+        quit:'tSC
+        
+    }
+    Catch ex {
+        Set tSC=ex.AsStatus()
+    }
+    Return tSC
 }
 
 }

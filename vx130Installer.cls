@@ -14,6 +14,7 @@ XData VX130Manifest [ XMLNamespace = INSTALLER ]
      <Configuration>
        <Database Name="vx130code" Dir="/irisdb/vx130/vx130code/" Create="overwrite" />
        <Database Name="vx130data" Dir="/irisdb/vx130/vx130data/" Create="overwrite" />
+       <ClassMapping Package="HS.SDA3" From="HSLIB"/>
      </Configuration>
    </Namespace>
    <Namespace  Name="%SYS" Create="no" Code="IRISSYS" Data="IRISSYS"  >

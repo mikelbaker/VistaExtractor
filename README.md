@@ -68,3 +68,16 @@ to run the attributeMap:
 
 http://localhost
 
+
+Populate VISTA Systems Patient Files
+
+    ./PopulatePatient
+
+To get a VX130 Patient as SDA object
+
+docker exec -it vx130 iris session iris -U VX130
+d ##class(SPatient.SPatient2v001).ToSDA("673||1").ToQuickXML()
+
+
+SELECT * FROM SDA.AttributeMap
+
