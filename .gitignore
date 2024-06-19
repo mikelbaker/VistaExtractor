@@ -10,3 +10,4 @@ web/webgateway/CSP.log
 accessToken.txt
 DBA_VISTA_FOIA_*.zip
 settings.json
+launch.json

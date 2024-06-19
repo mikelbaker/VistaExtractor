@@ -1,24 +1,30 @@
 #!/bin/bash
 docker compose down
-docker image rm vistaextractor-bay vistaextractor-tam vistaextractor-wpb vistaextractor-v08 vistaextractor-vx130
+docker image rm vistaextractor_bay vistaextractor_tam vistaextractor_wpb vistaextractor_v08 vistaextractor_vx130 vistaextractor_flr vistaextractor_fdw
 
 sudo rm -rf bay
 sudo rm -rf tam
 sudo rm -rf wpb
 sudo rm -rf v08
 sudo rm -rf vx130
+sudo rm -rf flr
+sudo rm -rf fdw
 
 mkdir -p bay/code bay/db/rou bay/jrn/jrn bay/jrn/alt bay/sys
 mkdir -p tam/code tam/db/rou tam/jrn/jrn tam/jrn/alt tam/sys
 mkdir -p wpb/code wpb/db/rou wpb/jrn/jrn wpb/jrn/alt wpb/sys
 mkdir -p v08/code v08/db/v08/bay/rou v08/db/v08/tam/rou v08/db/v08/wpb/rou v08/jrn/jrn v08/jrn/alt v08/sys
 mkdir -p vx130/code vx130/db/vx130/vx130code vx130/db/vx130/vx130data vx130/jrn/jrn vx130/jrn/alt vx130/sys
+mkdir -p flr/code flr/jrn/jrn flr/jrn/alt flr/sys
+mkdir -p fdw/code fdw/jrn/jrn fdw/jrn/alt fdw/sys fdw/db/fdw1 fdw/db/fdwpriv
 
-docker run -v $(pwd)/bay/code:/code -v $(pwd)/bay/sys:/irissys -v $(pwd)/bay/db:/irisdb -v $(pwd)/bay/jrn:/irisjrn --name bay -d intersystems/irishealth:2023.2.0.201.0
-docker run -v $(pwd)/tam/code:/code -v $(pwd)/tam/sys:/irissys -v $(pwd)/tam/db:/irisdb -v $(pwd)/tam/jrn:/irisjrn --name tam -d intersystems/irishealth:2023.2.0.201.0
-docker run -v $(pwd)/wpb/code:/code -v $(pwd)/wpb/sys:/irissys -v $(pwd)/wpb/db:/irisdb -v $(pwd)/wpb/jrn:/irisjrn --name wpb -d intersystems/irishealth:2023.2.0.201.0
-docker run -v $(pwd)/v08/code:/code -v $(pwd)/v08/sys:/irissys -v $(pwd)/v08/db:/irisdb -v $(pwd)/v08/jrn:/irisjrn --name v08 -d intersystems/irishealth:2023.2.0.201.0
-docker run -v $(pwd)/vx130/code:/code -v $(pwd)/vx130/sys:/irissys -v $(pwd)/vx130/db:/irisdb -v $(pwd)/vx130/jrn:/irisjrn --name vx130 -d intersystems/irishealth:2023.2.0.201.0
+docker run -v $(pwd)/bay/code:/code -v $(pwd)/bay/sys:/irissys -v $(pwd)/bay/db:/irisdb -v $(pwd)/bay/jrn:/irisjrn --name bay -d container.intersystems.com/intersystems/irishealth:2024.1
+docker run -v $(pwd)/tam/code:/code -v $(pwd)/tam/sys:/irissys -v $(pwd)/tam/db:/irisdb -v $(pwd)/tam/jrn:/irisjrn --name tam -d container.intersystems.com/intersystems/irishealth:2024.1
+docker run -v $(pwd)/wpb/code:/code -v $(pwd)/wpb/sys:/irissys -v $(pwd)/wpb/db:/irisdb -v $(pwd)/wpb/jrn:/irisjrn --name wpb -d container.intersystems.com/intersystems/irishealth:2024.1
+docker run -v $(pwd)/v08/code:/code -v $(pwd)/v08/sys:/irissys -v $(pwd)/v08/db:/irisdb -v $(pwd)/v08/jrn:/irisjrn --name v08 -d container.intersystems.com/intersystems/irishealth:2024.1
+docker run -v $(pwd)/vx130/code:/code -v $(pwd)/vx130/sys:/irissys -v $(pwd)/vx130/db:/irisdb -v $(pwd)/vx130/jrn:/irisjrn --name vx130 -d container.intersystems.com/intersystems/irishealth:2024.1
+docker run -v $(pwd)/flr/code:/code -v $(pwd)/flr/sys:/irissys -v $(pwd)/v08/jrn:/irisjrn --name flr -d container.intersystems.com/intersystems/irishealth:2024.1
+docker run -v $(pwd)/fdw/code:/code -v $(pwd)/fdw/sys:/irissys -v $(pwd)/fdw/db:/irisdb -v $(pwd)/v08/jrn:/irisjrn --name fdw -d container.intersystems.com/intersystems/irishealth:2024.1
 sleep 20
 
 docker exec -it --user root bay chown -R irisowner:irisowner /irisdb /irisjrn /irissys /code
@@ -26,12 +32,16 @@ docker exec -it --user root tam chown -R irisowner:irisowner /irisdb /irisjrn /i
 docker exec -it --user root wpb chown -R irisowner:irisowner /irisdb /irisjrn /irissys /code
 docker exec -it --user root v08 chown -R irisowner:irisowner /irisdb /irisjrn /irissys /code
 docker exec -it --user root vx130 chown -R irisowner:irisowner /irisdb /irisjrn /irissys /code
+docker exec -it --user root flr chown -R irisowner:irisowner /irisjrn /irissys /code
+docker exec -it --user root fdw chown -R irisowner:irisowner /irisdb /irisjrn /irissys /code
 
 docker cp vistaInstaller.cls bay:/code/
 docker cp vistaInstaller.cls tam:/code/
 docker cp vistaInstaller.cls wpb:/code/
 docker cp v08Installer.cls v08:/code/
 docker cp vx130Installer.cls vx130:/code/
+docker cp flrInstaller.cls flr:/code
+docker cp fdwInstaller.cls fdw:/code
 docker cp src vx130:/code/
 docker cp VISTAPopulate bay:/code/
 docker cp VISTAPopulate tam:/code/
@@ -42,12 +52,16 @@ docker stop tam
 docker stop wpb
 docker stop v08
 docker stop vx130
+docker stop flr
+docker stop fdw
 
 docker rm bay
 docker rm tam
 docker rm wpb
 docker rm v08
 docker rm vx130
+docker rm flr
+docker rm fdw
 
 
 

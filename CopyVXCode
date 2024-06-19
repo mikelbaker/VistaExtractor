@@ -9,7 +9,7 @@ docker exec -it v08 iris session iris -U vx130 "##class(VX130.VistaSite).Init()"
 docker exec -it v08 iris session iris -U vx130 "##class(VX130.GlobalsToWatch).Init()"
 docker exec -it v08 iris session iris -U vx130 "##class(VX130Task.AddJournalFileTask).ScheduleEveryMinute()"
 docker exec -it v08 iris session iris -U vx130 "##class(VX130Task.JournalReaderTask).ScheduleEveryMinute()"
-docker exec -it v08 iris session iris -U vx130 "##class(VX130Task.DataFilerTask).ScheduleEveryMinute()"
+docker exec -it flr iris session iris -U vx130 "##class(VX130Task.DataFilerTask).ScheduleEveryMinute()"
 
 docker exec -it v08 iris session iris -U vx130 "##class(VX130.JournalReaderStatus).Init()"
 docker exec -it v08 iris session iris -U vx130 "##class(SDA.AttributeMap).Init()"

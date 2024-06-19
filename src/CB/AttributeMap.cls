@@ -28,6 +28,34 @@ Property MaxLength As %Integer;
 /// Description
 Property NumericScale As %String;
 
+/// Description
+ClassMethod Init() As %Status
+{
+    Do ..%KillExtent()
+    Set sc = $$$OK
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','Name','30','784'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','SexCode','50','785'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','SelfIdentifiedGenderCode','50','786'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','MaritalStatusIEN','50','791'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','RaceIEN','50','792'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','Occupation','30','793'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','ReligiousPreferenceIEN','50','794'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','SocialSecurityNumber','50','798'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','StreetAddressLine1','35','822'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','StreetAddressLine2','30','825'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','StreetAddressLine3','30','826'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','City','15','827'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','StateIEN','50','828'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','ZipCode','5','844'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','ServiceConnectedCode','50','1010'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','SPatient.SPatient2v001','VeteranCode','50','1333'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, VistaField) VALUES('%FilemanTimeStamp','SPatient.SPatient2v001','DateOfBirth','789'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, VistaField) VALUES('%FilemanTimeStamp','SPatient.SPatient2v001','DateEnteredIntoFile','809'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, VistaField) VALUES('%Integer','SPatient.SPatient2v001','PatientICN','1289'))
+    &sql(INSERT INTO CB.AttributeMap(DataDomain,DataType, IRISClassName, IRISPropertyName, VistaFile) VALUES('FMPK','%String','SPatient.SPatient2v001','PatientIEN','118'))
+    Return sc
+}
+
 /// Given a VistaFile ID, add all VistaFields to the attributeMap
 ClassMethod New(pVistaFileID As %Integer, pIRISClassName As %String) As %Status
 {

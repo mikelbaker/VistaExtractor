@@ -26,7 +26,7 @@ ClassMethod Init() As %Status
     Try {
         do ..%KillExtent()
         &SQL(INSERT INTO SDA.AttributeMap(SDAClassName,SDAPropertyName,VX130ClassName,VX130Properties,HelperClassMethod)
-            VALUES('HS.SDA3.Patient','MPIID','SPatient.SPatient2v001','ICN',NULL))
+            VALUES('HS.SDA3.Patient','MPIID','SPatient.SPatient2v001','PatientICN',NULL))
         &SQL(INSERT INTO SDA.AttributeMap(SDAClassName,SDAPropertyName,VX130ClassName,VX130Properties,HelperClassMethod)
             VALUES('HS.SDA3.Patient','Name','SPatient.SPatient2v001','Name','##class(SDA.Utility).GetName'))
         &SQL(INSERT INTO SDA.AttributeMap(SDAClassName,SDAPropertyName,VX130ClassName,VX130Properties,HelperClassMethod)
@@ -34,7 +34,7 @@ ClassMethod Init() As %Status
         &SQL(INSERT INTO SDA.AttributeMap(SDAClassName,SDAPropertyName,VX130ClassName,VX130Properties,HelperClassMethod)
             VALUES('HS.SDA3.Patient','BirthTime','SPatient.SPatient2v001','DateOfBirth','##class(%FilemanTimeStamp).LogicalToOdbc'))
         &SQL(INSERT INTO SDA.AttributeMap(SDAClassName,SDAPropertyName,VX130ClassName,VX130Properties,HelperClassMethod,List)
-            VALUES('HS.SDA3.Patient','Addresses','SPatient.SPatient2v001','Sta3n,StreetAddressLine1,StreetAddressLine2,City,StateIEN,Zip4','##class(SDA.Utility).GetAddress',1))
+            VALUES('HS.SDA3.Patient','Addresses','SPatient.SPatient2v001','Sta3n,StreetAddressLine1,StreetAddressLine2,City,StateIEN,ZipCode','##class(SDA.Utility).GetAddress',1))
         
     }
     Catch ex {

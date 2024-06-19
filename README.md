@@ -5,6 +5,13 @@ This project will create three VISTA mirrors, and an Async RO mirror that will a
 
 To start you will need a couple of things A copy of the VISTA database from FOIA and if you want to run a seperate database server you will need an IRIS key that allows for ECP use.  YOu will also need an IRIS image from Intersystems, and a Web Gateway image from intersystems.
 
+IRIS Images: 
+https://container.intersystems.com/
+
+FOIA Database:
+wget https://foia-vista.worldvista.org/DBA_VistA_FOIA_System_Files/DBA_VISTA_FOIA_2024/DBA_VISTA_FOIA_20240531.zip
+unzip DBA_VISTA_FOIA_20240531.zip
+
 Once you have the required pieces you can run the CleanUp script that will set up the directories so that your data and code will be persisted from one session to another.  
 
     ./CleanUp
@@ -76,8 +83,27 @@ Populate VISTA Systems Patient Files
 To get a VX130 Patient as SDA object
 
 docker exec -it vx130 iris session iris -U VX130
-d ##class(SPatient.SPatient2v001).ToSDA("673||1").ToQuickXML()
+d ##class(SPatient.SPatient2v001).ToSDA("516||1").ToQuickXML()
 
 
 SELECT * FROM SDA.AttributeMap
 
+RUN SOME QUERIES:
+
+http://localhost/vx130/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE=VX130
+
+SELECT * from VX130.IRISInstance
+
+SELECT * FROM VX130.JournalFile
+
+SELECT * from VX130.JournalReaderStatus
+
+SELECT * from VX130.JournalReaderHistory
+
+SELECT * FROM VX130.GlobalsToWatch
+
+
+SELECT Sta3n,COUNT(*) FROM Dim.VistaFieldv001 GROUP BY Sta3n
+
+
+SELECT * FROM Dim.VistaFieldv001 WHERE VistaFileNumber='2' AND VistaFieldNumber='.01'
