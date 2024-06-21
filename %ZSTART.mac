@@ -33,15 +33,28 @@ SYSTEM  ;
                 do ##class(%SYS.System).WriteToConsoleLog("Installer not found.")
             }
         }
-    } elseif tInstance="VX130" {
-        if ##class(Config.Namespaces).Exists("VX130") { 
-            do ##class(%SYS.System).WriteToConsoleLog("VX130 system already configured.")
+    } elseif tInstance="fdw" {
+        if ##class(Config.Databases).Exists("vx130code") { 
+            do ##class(%SYS.System).WriteToConsoleLog("fdw system already configured.")
         } else {
-            do ##class(%SYS.System).WriteToConsoleLog("Start VX130 Configuration.")
-            if ##class(%File).Exists("/code/vx130Installer.cls") {
-                do $SYSTEM.OBJ.Load("/code/vx130Installer.cls","cuk")
-                do ##class(vx130.Installer).setup()
-                do ##class(%SYS.System).WriteToConsoleLog("End VX130 Configuration.")
+            do ##class(%SYS.System).WriteToConsoleLog("Start fdw Configuration.")
+            if ##class(%File).Exists("/code/fdwInstaller.cls") {
+                do $SYSTEM.OBJ.Load("/code/fdwInstaller.cls","cuk")
+                do ##class(fdw.Installer).setup()
+                do ##class(%SYS.System).WriteToConsoleLog("End fdw Configuration.")
+            } else {
+                do ##class(%SYS.System).WriteToConsoleLog("Installer not found.")
+            }
+        }
+    } elseif tInstance="flr" {
+        if ##class(Config.Namespaces).Exists("flr") { 
+            do ##class(%SYS.System).WriteToConsoleLog("flr system already configured.")
+        } else {
+            do ##class(%SYS.System).WriteToConsoleLog("Start flr Configuration.")
+            if ##class(%File).Exists("/code/flrInstaller.cls") {
+                do $SYSTEM.OBJ.Load("/code/flrInstaller.cls","cuk")
+                do ##class(flr.Installer).setup()
+                do ##class(%SYS.System).WriteToConsoleLog("End flr Configuration.")
             } else {
                 do ##class(%SYS.System).WriteToConsoleLog("Installer not found.")
             }

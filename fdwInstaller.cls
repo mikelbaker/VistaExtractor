@@ -10,10 +10,12 @@ XData fdwManifest [ XMLNamespace = INSTALLER ]
    <SystemSetting Name="Config.config.MaxServerConn" Value="30" />
    <SystemSetting Name="Config.Journal.CurrentDirectory" Value="/irisjrn/jrn" />
    <SystemSetting Name="Config.Journal.AlternateDirectory" Value="/irisjrn/alt" />
-   <Namespace  Name="%SYS" Create="no" Code="IRISSYS" Data="IRISSYS"  >
+   <Namespace  Name="%SYS" Create="no" Code="IRISSYS" Data="IRISSYS" Ensemble="0" >
      <Configuration>
        <Database Name="fdw1" Dir="/irisdb/fdw/fdw1/" Create="overwrite" />
        <Database Name="fdwpriv" Dir="/irisdb/fdw/fdwpriv/" Create="overwrite" />
+       <Database Name="vx130code" Dir="/irisdb/vx130/vx130code/" Create="overwrite" />
+       <Database Name="vx130data" Dir="/irisdb/vx130/vx130data/" Create="overwrite" />
       </Configuration>
      <Invoke Class="fdw.Installer" Method="EnableECPService" CheckStatus="1" />
    </Namespace>

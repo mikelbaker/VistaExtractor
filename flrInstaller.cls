@@ -10,8 +10,7 @@ XData flrManifest [ XMLNamespace = INSTALLER ]
    <SystemSetting Name="Config.config.MaxServerConn" Value="30" />
    <SystemSetting Name="Config.Journal.CurrentDirectory" Value="/irisjrn/jrn" />
    <SystemSetting Name="Config.Journal.AlternateDirectory" Value="/irisjrn/alt" />
-   <Namespace  Name="%SYS" Create="no" Code="IRISSYS" Data="IRISSYS"  >
-     <Invoke Class="flr.Installer" Method="EnableECPService" CheckStatus="1" />
+   <Namespace  Name="%SYS" Create="no" Code="IRISSYS" Data="IRISSYS" Ensemble="0" >
      <Invoke Class="flr.Installer" Method="AddECPConnection" CheckStatus="1" />
      <Invoke Class="flr.Installer" Method="AddVX130RemoteDBs" CheckStatus="1" />
      <Invoke Class="flr.Installer" Method="AddV08RemoteDBs" CheckStatus="1" />
@@ -36,6 +35,7 @@ XData flrManifest [ XMLNamespace = INSTALLER ]
      <Configuration>
        <GlobalMapping Global="Dim*" From="fdw1"/>
        <GlobalMapping Global="SPatient*" From="fdwpriv"/>
+       <ClassMapping Package="HS.SDA3" From="HSLIB"/>
      </Configuration>
    </Namespace>
 </Manifest>
@@ -54,14 +54,15 @@ ClassMethod AddECPConnection() As %Status
 {
   set tsc = $$$OK
   try {
-    for tName="vx130","v08","fdw"
-    if ##Class(Config.ECPServers).Exists(tName,.Obj) {
-        do ##class(%SYS.System).WriteToConsoleLog(tName_" ECP connection is already configured.")
-      } else {
-        set tProperties("Address")=tName
-        set tProperties("Port")="1972"
-        set tsc=##Class(Config.ECPServers).Create(tName,.tProperties)
-      }
+    for tName="v08","fdw" {
+      if ##Class(Config.ECPServers).Exists(tName,.Obj) {
+          do ##class(%SYS.System).WriteToConsoleLog(tName_" ECP connection is already configured.")
+        } else {
+          set tProperties("Address")=tName
+          set tProperties("Port")="1972"
+          set tsc=##Class(Config.ECPServers).Create(tName,.tProperties)
+        }
+    }
   }
   catch ex {
     set tsc=ex.AsStatus()
@@ -81,7 +82,7 @@ ClassMethod AddVX130RemoteDBs() As %Status
         do ##class(%SYS.System).WriteToConsoleLog(tName_" is already configured.")
       } else {
         set tProperties("Directory")="/irisdb/vx130/"_tName_"/"
-        set tProperties("Server")="vx130"
+        set tProperties("Server")="fdw"
         set tsc=##Class(Config.Databases).Create(tName,.tProperties)
       }
     }
@@ -156,6 +157,30 @@ ClassMethod AddVX130Namespace() As %Status
     set tsc=ex.AsStatus()
   }
   return tsc
+}
+
+/// Description
+ClassMethod AddAPI() As %Status
+{
+  Set tSC = $$$OK
+  Try {
+    set name="/api/cb"
+    set app=##class(Security.Applications).%OpenId(name)
+    if '$ISOBJECT(app)
+    {
+      set Properties("AutheEnabled")=32
+      set Properties("CSPZENEnabled")=1
+      set Properties("Description")="ClassBuilder REST APIs"
+      set Properties("DispatchClass")="CB.ClassBuilderREST"
+      set Properties("Enabled")=1
+      set Properties("NameSpace")="VX130"
+      set tSC=##class(Security.Applications).Create(name,.Properties)
+    }
+  }
+  Catch ex {
+    Set tSC=ex.AsStatus()
+  }
+  Return tSC
 }
 
 }

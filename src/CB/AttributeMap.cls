@@ -53,6 +53,14 @@ ClassMethod Init() As %Status
     &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, VistaField) VALUES('%FilemanTimeStamp','SPatient.SPatient2v001','DateEnteredIntoFile','809'))
     &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, VistaField) VALUES('%Integer','SPatient.SPatient2v001','PatientICN','1289'))
     &sql(INSERT INTO CB.AttributeMap(DataDomain,DataType, IRISClassName, IRISPropertyName, VistaFile) VALUES('FMPK','%String','SPatient.SPatient2v001','PatientIEN','118'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','Dim.State5v001','Name','30','2808'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','Dim.State5v001','Abbreviation','5','2809'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','Dim.State5v001','VAStateCode','2','2810'))
+    &sql(INSERT INTO CB.AttributeMap(DataType, IRISClassName, IRISPropertyName, MaxLength, VistaField) VALUES('%String','Dim.State5v001','Capital','30','2814'))
+    &sql(INSERT INTO CB.AttributeMap(DataDomain,DataType, IRISClassName, IRISPropertyName, VistaFile) VALUES('FMPK','%String','Dim.State5v001','StateIEN','294'))
+    &sql(INSERT INTO VX130.GlobalsToWatch(GlobalName,ClassName,NumberOfSubscripts,PrimaryKeys,FirstSubscript,SubscriptCompare) VALUES ('^DPT','SPatient.SPatient2v001',2,'1',NULL,NULL))
+    &sql(INSERT INTO VX130.GlobalsToWatch(GlobalName,ClassName,NumberOfSubscripts,PrimaryKeys,FirstSubscript,SubscriptCompare) VALUES ('^DIC','Dim.State5v001',3,'2','5',NULL))
+    
     Return sc
 }
 

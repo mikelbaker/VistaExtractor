@@ -58,18 +58,6 @@ services:
       - IRIS_INSTANCE=V08
     container_name: v08
     hostname: v08
-  vx130:
-    build: .
-    volumes:
-      - ./vx130/sys:/irissys
-      - ./vx130/db:/irisdb
-      - ./vx130/jrn:/irisjrn
-      - ./vx130/code:/code
-    environment:
-      - ISC_DATA_DIRECTORY=/irissys
-      - IRIS_INSTANCE=VX130
-    container_name: vx130
-    hostname: vx130
   flr:
     build: .
     volumes:

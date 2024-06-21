@@ -1,7 +1,13 @@
 #!/bin/bash
+
+
+echo "Stop IRIS on v08"
 docker exec -it v08 iris stop IRIS quietly
+echo "Stop IRIS on bay"
 docker exec -it bay iris stop IRIS quietly
+echo "Stop IRIS on tam"
 docker exec -it tam iris stop IRIS quietly
+echo "Stop IRIS on wpb"
 docker exec -it wpb iris stop IRIS quietly
 
 sudo rsync -ah --progress ./bay/db/rou/IRIS.DAT ./v08/db/v08/bay/rou/IRIS.DAT
@@ -12,7 +18,26 @@ docker exec -it --user root v08 chown irisowner:irisowner /irisdb/v08/bay/rou/IR
 docker exec -it --user root v08 chown irisowner:irisowner /irisdb/v08/tam/rou/IRIS.DAT
 docker exec -it --user root v08 chown irisowner:irisowner /irisdb/v08/wpb/rou/IRIS.DAT
 
+echo "Start IRIS on bay"
 docker exec -it bay iris start IRIS
+echo "Start IRIS on tam"
 docker exec -it tam iris start IRIS
+echo "Start IRIS on wpb"
 docker exec -it wpb iris start IRIS
+echo "Start IRIS on v08"
 docker exec -it v08 iris start IRIS
+
+echo "Create AsyncRO Mirrors in v08"
+sleep 15
+docker exec -it v08 iris session iris -U "%SYS" "##class(SYS.Mirror).JoinMirrorAsAsyncMember(\"BAY\",\"V08\",\"IRIS\",\"bay\",2188,1)"
+docker exec -it v08 iris session iris -U "%SYS" "##class(SYS.Mirror).JoinMirrorAsAsyncMember(\"TAM\",\"V08\",\"IRIS\",\"tam\",2188,1)"
+docker exec -it v08 iris session iris -U "%SYS" "##class(SYS.Mirror).JoinMirrorAsAsyncMember(\"WPB\",\"V08\",\"IRIS\",\"wpb\",2188,1)"
+sleep 5
+docker exec -it v08 iris session iris -U "%SYS" "##class(SYS.Mirror).ActivateMirroredDatabase(\"/irisdb/v08/bay/rou/\")"
+docker exec -it v08 iris session iris -U "%SYS" "##class(SYS.Mirror).ActivateMirroredDatabase(\"/irisdb/v08/tam/rou/\")"
+docker exec -it v08 iris session iris -U "%SYS" "##class(SYS.Mirror).ActivateMirroredDatabase(\"/irisdb/v08/wpb/rou/\")"
+sleep 5
+docker exec -it v08 iris session iris -U "%SYS" "##class(v08.Installer).ActivateMirrorDBs()"
+
+
+

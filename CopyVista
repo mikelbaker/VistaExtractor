@@ -1,6 +1,12 @@
 #!/bin/bash
+# give iris time to start and finish manifest setup
+echo "Wait 60 secs for all containers to finish startup."
+sleep 60
+echo "Stop IRIS on bay"
 docker exec -it bay iris stop IRIS quietly
+echo "Stop IRIS on tam"
 docker exec -it tam iris stop IRIS quietly
+echo "Stop IRIS on wpb"
 docker exec -it wpb iris stop IRIS quietly
 
 sudo rsync -ah --progress IRIS.DAT ./bay/db/rou/
@@ -11,6 +17,14 @@ docker exec -it --user root bay chown irisowner:irisowner /irisdb/rou/IRIS.DAT
 docker exec -it --user root tam chown irisowner:irisowner /irisdb/rou/IRIS.DAT
 docker exec -it --user root wpb chown irisowner:irisowner /irisdb/rou/IRIS.DAT
 
+echo "Start IRIS on bay"
 docker exec -it bay iris start IRIS
+echo "Start IRIS on tam"
 docker exec -it tam iris start IRIS
+echo "Start IRIS on wpb"
 docker exec -it wpb iris start IRIS
+
+echo "Adding VISTA databases to primary mirror"
+docker exec -it bay iris session iris -U "%SYS" "##class(SYS.Mirror).AddDatabase(\"/irisdb/rou/\",\"rou\")"
+docker exec -it tam iris session iris -U "%SYS" "##class(SYS.Mirror).AddDatabase(\"/irisdb/rou/\",\"rou\")"
+docker exec -it wpb iris session iris -U "%SYS" "##class(SYS.Mirror).AddDatabase(\"/irisdb/rou/\",\"rou\")"

@@ -28,7 +28,8 @@ bay         : http://localhost/bay/csp/sys/UtilHome.csp
 tam         : http://localhost/tam/csp/sys/UtilHome.csp
 wpb         : http://localhost/wpb/csp/sys/UtilHome.csp
 v08         : http://localhost/v08/csp/sys/UtilHome.csp
-vx130       : http://localhost/vx130/csp/sys/UtilHome.csp
+flr         : http://localhost/flr/csp/sys/UtilHome.csp
+fdw         : http://localhost/fdw/csp/sys/UtilHome.csp
 web gateway : http://localhost/csp/bin/Systems/Module.cxw
 
 Next you add the VISTA databases to the three VISTA systems using the CopyVista script.  This will stop IRIS on each of the VISTA containers and copy the VISTA database to thier persistent storea and then start VISTA back up.
@@ -52,6 +53,7 @@ with the databases setup as primary mirror now you can get a backup of each of t
 
     ./BackupMirror
 
+
 Now you will need to configure the Async RO mirror using the SMP.
 
 v08 : http://localhost/v08/csp/sys/%25CSP.Portal.Home.zen
@@ -73,7 +75,7 @@ Create the ClassBuilder APIS
 
 to run the attributeMap:
 
-http://localhost
+http://localhost:8080
 
 
 Populate VISTA Systems Patient Files
@@ -82,7 +84,7 @@ Populate VISTA Systems Patient Files
 
 To get a VX130 Patient as SDA object
 
-docker exec -it vx130 iris session iris -U VX130
+docker exec -it flr iris session iris -U VX130
 d ##class(SPatient.SPatient2v001).ToSDA("516||1").ToQuickXML()
 
 
@@ -107,3 +109,6 @@ SELECT Sta3n,COUNT(*) FROM Dim.VistaFieldv001 GROUP BY Sta3n
 
 
 SELECT * FROM Dim.VistaFieldv001 WHERE VistaFileNumber='2' AND VistaFieldNumber='.01'
+
+SELECT Sta3n,COUNT(*) FROM Dim.State5v001 GROUP BY Sta3n
+

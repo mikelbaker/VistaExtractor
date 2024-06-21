@@ -1,25 +1,31 @@
 #!/bin/bash
-docker exec -it vx130 iris session iris -U vx130 "##class(%SYSTEM.OBJ).LoadDir(\"/code/src/\",\"cku\",,1)"
+# fdw needs to pick up new config to allow more than 2 ecp connections
+docker exec -it fdw iris stop iris quietly
+docker exec -it fdw iris start iriS
+sleep 5
+
+docker exec -it flr iris session iris -U vx130 "##class(%SYSTEM.OBJ).LoadDir(\"/code/src/\",\"cku\",,1)"
 docker exec -it bay iris session iris -U vah "##class(%SYSTEM.OBJ).LoadDir(\"/code/VISTAPopulate/\",\"cku\",,1)"
 docker exec -it tam iris session iris -U vah "##class(%SYSTEM.OBJ).LoadDir(\"/code/VISTAPopulate/\",\"cku\",,1)"
 docker exec -it wpb iris session iris -U vah "##class(%SYSTEM.OBJ).LoadDir(\"/code/VISTAPopulate/\",\"cku\",,1)"
 
-docker exec -it v08 iris session iris -U vx130 "##class(VX130.IRISInstance).Init()"
-docker exec -it v08 iris session iris -U vx130 "##class(VX130.VistaSite).Init()"
-docker exec -it v08 iris session iris -U vx130 "##class(VX130.GlobalsToWatch).Init()"
+docker exec -it flr iris session iris -U vx130 "##class(VX130.IRISInstance).Init()"
+docker exec -it flr iris session iris -U vx130 "##class(VX130.VistaSite).Init()"
+docker exec -it flr iris session iris -U vx130 "##class(VX130.GlobalsToWatch).Init()"
 docker exec -it v08 iris session iris -U vx130 "##class(VX130Task.AddJournalFileTask).ScheduleEveryMinute()"
 docker exec -it v08 iris session iris -U vx130 "##class(VX130Task.JournalReaderTask).ScheduleEveryMinute()"
 docker exec -it flr iris session iris -U vx130 "##class(VX130Task.DataFilerTask).ScheduleEveryMinute()"
 
-docker exec -it v08 iris session iris -U vx130 "##class(VX130.JournalReaderStatus).Init()"
-docker exec -it v08 iris session iris -U vx130 "##class(SDA.AttributeMap).Init()"
+docker exec -it flr iris session iris -U vx130 "##class(VX130.JournalReaderStatus).Init()"
+docker exec -it flr iris session iris -U vx130 "##class(SDA.AttributeMap).Init()"
+docker exec -it flr iris session iris -U vx130 "##class(CB.AttributeMap).Init()"
 
-docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFilev001).BuildSite(516)"
-docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFilev001).BuildSite(548)"
-docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFilev001).BuildSite(673)"
+docker exec -it flr iris session iris -U vx130 "##class(Dim.VistaFilev001).BuildSite(516)"
+docker exec -it flr iris session iris -U vx130 "##class(Dim.VistaFilev001).BuildSite(548)"
+docker exec -it flr iris session iris -U vx130 "##class(Dim.VistaFilev001).BuildSite(673)"
 
-docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFieldv001).BuildSite(516)"
-docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFieldv001).BuildSite(548)"
-docker exec -it v08 iris session iris -U vx130 "##class(Dim.VistaFieldv001).BuildSite(673)"
+docker exec -it flr iris session iris -U vx130 "##class(Dim.VistaFieldv001).BuildSite(516)"
+docker exec -it flr iris session iris -U vx130 "##class(Dim.VistaFieldv001).BuildSite(548)"
+docker exec -it flr iris session iris -U vx130 "##class(Dim.VistaFieldv001).BuildSite(673)"
 
-docker exec -it vx130 iris session iris -U %SYS "##class(vx130.Installer).AddAPI()"
+docker exec -it flr iris session iris -U %SYS "##class(flr.Installer).AddAPI()"
